@@ -1,0 +1,2312 @@
+% Copyright (C) 2011 Pierrick Bruneau, see README for full notice
+\documentclass{article}
+\usepackage[english]{babel}
+\selectlanguage{english}
+\usepackage{multicol}
+\usepackage{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{psfrag}
+\usepackage{hyperref}
+\usepackage{epsfig}
+\usepackage[latin1]{inputenc} 
+\usepackage{amsmath}
+\usepackage[authoryear]{natbib}
+\citestyle{plainnat}
+
+\setlength\parindent{0pt}
+
+\title{VBmix package user manual}
+\author{Copyright (C) 2011 Pierrick Bruneau, mailto:pbruneau@gmail.com \\ see README for full notice}
+\date{February 2011}
+
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\pagebreak
+
+\section{installation [DEPRECATED]} \label{sec_install}
+
+Full instructions for building the package may be found in the INSTALL file.\\
+
+The package is loaded in R using: \\
+
+\hspace*{5mm}\texttt{source("[path\_to\_VBmix]/VBmix/VBmix.R", chdir=TRUE)} \\
+
+\texttt{chdir=TRUE} is necessary for independence with regard to the chosen installation directory. Note that the path to VBmix is stored in $\texttt{VBmixwd}$ for further use in R. \\
+
+VBmix depends on the following R packages (available at \texttt{http://cran.r-project.org/web/packages/}):
+
+\begin{itemize}
+\item e1071 (SVM + misc)
+\item lattice (standard graphics package)
+\item grid (standard graphics package)
+\item nnet (neural networks)
+\item pixmap (image manipulation)
+\item mnormt (multivariate normal)
+\item MASS (statistical tools and data sets)
+\end{itemize}
+
+
+\section{usage: function index} \label{sec_functions}
+
+In this section we propose an entry per function available in the package. Note that C/C++ routines of this package should be accessed only through interface functions (interfaces.R). \\
+
+Type-checking is not always performed in C routines: incorrect parametrization may cause R to crash.
+
+\subsection{newGmm} \label{sec_newgmm}
+
+\hspace*{5mm}\texttt{newGmm()} \\
+
+creates an empty GMM data structure. \\
+
+\textbf{parameters:} none \\
+
+\textbf{returns:} \texttt{list} object with the following members:
+
+\begin{itemize}
+\item \texttt{\$w}: \texttt{numeric} vector containing the component weights of the mixture model.
+\item \texttt{\$mean}: \texttt{list} with respective means (\texttt{numeric} vectors) as elements.
+\item \texttt{\$cov}: \texttt{list} with respective covariance matrices as elements.
+\item \texttt{\$a}: constraints between components, encoded in a \texttt{numeric} vector. One value per component. 2 components associated to the same value are said to be from the same origin. Used in \texttt{vbconstr}.
+\end{itemize}
+
+\textbf{localisation:} misc/Rutils.R \\
+
+
+\textbf{example:}\\
+\hspace*{5mm}\texttt{temp <- newGmm()}\\
+
+\textbf{see:}\\
+
+\subsection{appendToGmm} \label{sec_appendtogmm}
+
+\hspace*{5mm}\texttt{appendToGmm(mod1, mod2)} \\
+
+concatenates mod2 to mod1. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod1}: GMM to which mod2 is appended.
+\item \texttt{mod2}: GMM appended to mod1.
+\end{itemize}
+
+\textbf{returns:} GMM with concatenated models, and \texttt{\$a} set accordingly. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm}\texttt{temp <- appendToGmm(gmmpen[[1]], gmmpen[[2]])} \\
+
+\textbf{see:}\\
+\texttt{newGmm}
+
+
+
+\subsection{newMppca} \label{sec_newmppca}
+
+\hspace*{5mm}\texttt{newMppca()} \\
+
+creates an empty posterior MPPCA data structure. \\
+
+\textbf{parameters:} none.\\
+
+\textbf{returns:} \texttt{list} object with the following members:
+
+\begin{itemize}
+\item \texttt{\$alpha}: \texttt{numeric} vector for $\alpha$ parameter.
+\item \texttt{\$numoment}: \texttt{list} of \texttt{numeric} vectors, containing $\mathbb E[\nu_{kj}]$ parameters.
+\item \texttt{\$nub}: \texttt{list} of \texttt{numeric} vectors, containing $b_{kj}$ parameters for $\nu$.
+\item \texttt{\$taumoment}: \texttt{numeric} vector for $\tau$ parameter. NB: all set identically and statically to 1, as in \citep{bruneau10, bruneau10b} a single static $\tau$ parameter is used.
+\item \texttt{\$taua}: \texttt{numeric} vector for $a_k$ parameters for $\tau$.
+\item \texttt{\$taub}: \texttt{numeric} vector for $b_k$ parameters for $\tau$.
+\item \texttt{\$wmean} : \texttt{list} of matrices containing $\mathbb E[\Lambda_k]$ parameters.
+\item \texttt{\$wsigma} : \texttt{list} of matrices containing $Cov(\Lambda_k^{i.})$.
+\item \texttt{\$xsigma}: \texttt{list} of matrices containing $Cov(\bold x_k)$.
+\item \texttt{\$mumean}: \texttt{list} of \texttt{numeric} vectors, containing means of the MPPCA model.
+\item \texttt{\$musigma}: \texttt{list} of matrices with covariances for the mean estimates.
+\item \texttt{\$mustar}: \texttt{list} of \texttt{numeric} vectors, containing prior means of the MPPCA model, used for initialisation.
+\end{itemize}
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm}\texttt{temp <- newMppca()} \\
+
+\textbf{see:}\\
+\citep{bruneau10, bruneau10b}
+
+
+
+\subsection{appendToMppca} \label{sec_appendtomppca}
+
+\hspace*{5mm}\texttt{appendToMppca(mod1, mod2)} \\
+
+appends mod2 to mod1.\\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod1}: MPPCA model to be appended to.
+\item \texttt{mod2}: MPPCA to append to mod1.
+\end{itemize}
+
+\textbf{returns:} appended models. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm}\texttt{temp <- appendToMppca(pcapen[[1]], pcapen[[2]])} \\
+
+\textbf{see:}\\
+\texttt{newMppca}
+
+
+\subsection{subMppca} \label{sec_submppca}
+
+\hspace*{5mm}\texttt{subMppca(model, prune=FALSE, thres=2.001, quick=FALSE, noxmean=TRUE)} \\
+
+removes unused components and factor columns from \texttt{model}.\\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{model}: MPPCA model to be shrinked.
+\item \texttt{prune}: if \texttt{TRUE}, void factor columns are removed.
+\item \texttt{thres}: threshold for component selection. A components is selected iif $\alpha > \text{thres}$.
+\item \texttt{quick}: influences method for void factor columns detection. If \texttt{FALSE}, a KL-based criterion is employed (more accurate). If \texttt{TRUE}, column norms are used (useful for very high dimensional data sets).
+\item \texttt{noxmean}: should always be set to \texttt{TRUE}.
+\end{itemize}
+
+\textbf{returns:} shrinked MPPCA model. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm}\texttt{temp <- mppca(pendat, 15, qmax=8, maxit=50)} \\
+\hspace*{5mm}\texttt{temp2 <- subMppca(temp, prune=T, quick=TRUE)} \\
+
+
+\textbf{see:}
+
+
+
+\subsection{mppcaToGmm} \label{sec_mppcatogmm}
+
+\hspace*{5mm}\texttt{mppcaToGmm(model, notau=FALSE)} \\
+
+converts a MPPCA model to a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{model}: MPPCA model to be converted.
+\item \texttt{notau}: if \texttt{TRUE}, covariances are built with $\Lambda \Lambda^T$ without adding $\tau$.
+\end{itemize}
+
+\textbf{returns:} GMM after conversion.\\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm}\texttt{temp <- mppcaToGmm(pcapen[[1]])} \\
+
+\textbf{see:}
+\citep{tipping99}
+
+
+\subsection{subGmm} \label{sec_subgmm}
+
+\hspace*{5mm}\texttt{subGmm(model, dims=c(1,2), inds=NULL)} \\
+
+select a subset of components and dimensions from an input GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{model}: GMM from which to extract subsets.
+\item \texttt{dims}: \texttt{numeric} vector of the extracted dimensions.
+\item \texttt{inds}: \texttt{numeric} vector of selected components indices. If \texttt{NULL}, all components are selected.
+\end{itemize}
+
+\textbf{returns:} subset of input GMM. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm}\texttt{temp <- subGmm(gmmpen[[1]], inds=1:3)} \\
+
+\textbf{see:}
+
+
+
+\subsection{randomGmm} \label{sec_randomgmm}
+
+\hspace*{5mm}\texttt{randomGmm(domain=10)} \\
+
+sample randomly a GMM. Number of components is sampled from a Poisson law, means uniformly from \texttt{[-domain, domain]}, and covariance matrices using \texttt{covgen} function. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{domain}: determines the domain from which means are sampled.
+\end{itemize}
+
+\textbf{returns:} randomly sampled GMM. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm}\texttt{temp <- randomGmm()} \\
+
+\textbf{see:}
+
+
+
+\subsection{normMppca} \label{sec_normmppca}
+
+\hspace*{5mm}\texttt{normMppca(mppca1)}\\
+
+adjusts a MPPCA model to ensure that all factor matrices have same rank (\texttt{q}).\\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mppca1}: MPPCA model to be adjusted.
+\end{itemize}
+
+\textbf{returns:} adjusted MPPCA. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- newMppca()} \\
+\hspace*{5mm} \texttt{for(i in 1:5) temp <- appendToMppca(temp, pcapen[[i]])} \\
+\hspace*{5mm} \texttt{temp <- normMppca(temp)} \\
+
+\textbf{see:}
+
+
+
+\subsection{eigenMppca} \label{sec_eigenmppca}
+
+\hspace*{5mm}\texttt{eigenMppca(mod)} \\
+
+uses eigen decompositions to align factor matrices to principal bases (see \citep{tipping99}). NB: \texttt{mppca} and \texttt{mmppca} already perform this operation during their post-processing.\\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod}: MPPCA model which components have to be aligned.
+\end{itemize}
+
+\textbf{returns:} adjusted MPPCA. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- eigenMppca(pcapen[[2]])} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{gmmToMppca} \label{sec_gmmtomppca}
+
+\hspace*{5mm} \texttt{gmmToMppca(model, alpha=500)} \\
+
+uses eigen decompositions to convert a GMM to a MPPCA model. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{model}: GMM to be converted.
+\item \texttt{alpha}: GMM are associated to weights, and MPPCA models to population sizes. \texttt{alpha} is the chosen population size for the output MPPCA.
+\end{itemize}
+
+\textbf{returns:} converted MPPCA model. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- gmmToMppca(gmmpen[[3]])}\\
+
+\textbf{see:}
+
+
+
+\subsection{gramschmidt} \label{sec_gramschmidt}
+
+\hspace*{5mm} \texttt{gramschmidt(mat)}\\
+
+performs Gram-Schmidt orthogonalization on \texttt{mat}. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mat}: \texttt{matrix} object to orthogonalize.
+\end{itemize}
+
+\textbf{returns:} orthogonalized matrix. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- gramschmidt(pcapen[[3]]\$wmean[[1]])} \\
+
+\textbf{see:}
+
+
+
+
+
+\subsection{norm} \label{sec_norm}
+
+\hspace*{5mm} \texttt{norm(vec)} \\
+
+computes Euclidian norm of \texttt{vec}. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{vec}: \texttt{numeric} vector.
+\end{itemize}
+
+\textbf{returns:} norm value. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- norm(gmmpen[[2]]\$mean[[1]])} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{gaussianKL} \label{sec_gaussiankl}
+
+\hspace*{5mm} \texttt{gaussianKL(N0, N1)} \\
+
+computes $\text{KL} \bigl(\mathcal N(\bold 0, \Sigma_0) || \mathcal N(\bold 0, \Sigma_1) \bigr )$. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{N0}: $\Sigma_0$.
+\item \texttt{N1}: $\Sigma_1$.
+\end{itemize}
+
+\textbf{returns:} KL value. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- gaussianKL(gmmpen[[1]]\$cov[[1]], gmmpen[[1]]\$cov[[2]])} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{getQforComp} \label{sec_getqforcomp}
+
+\hspace*{5mm} \texttt{getQforComp(loadings, tau=1.0, verbose=FALSE, quick=FALSE)} \\
+
+gets the rank associated with a properly aligned factor matrix. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{loadings}: aligned factor matrix.
+\item \texttt{tau}: diagonal noise used for KL computations.
+\item \texttt{verbose}: if \texttt{TRUE} maximal info is displayed.
+\item \texttt{quick}: if \texttt{TRUE}, column norm values are used instead of KL computations (less accurate but faster).
+\end{itemize}
+
+\textbf{returns:} rank associated with \texttt{loadings}. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- getQforComp(handmods[[1]]\$wmean[[2]], quick=TRUE)} \\
+
+\textbf{see:}
+
+
+
+\subsection{isNonVoid} \label{sec_isnonvoid}
+
+\hspace*{5mm} \texttt{isNonVoid(loadings)} \\
+
+checks if \texttt{loadings} contains only void columns. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{loadings}: matrix from which we check the columns.
+\end{itemize}
+
+\textbf{returns:} \texttt{TRUE} if at least 1 column is not void. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{isNonVoid(handmods[[1]]\$wmean[[2]])} \\
+\hspace*{5mm} \texttt{[1] TRUE} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{appendToList} \label{sec_appendtolist}
+
+\hspace*{5mm} \texttt{appendToList(lst, obj, appendList=FALSE)} \\
+
+appends 1 list object to another. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{lst}: \texttt{list} object to which we append an object.
+\item \texttt{obj}: object to append.
+\item \texttt{appendList}: if \texttt{TRUE}, obj should be a \texttt{list} object, which elements are appended. if \texttt{FALSE}, obj is simply added to lst.
+\end{itemize}
+
+\textbf{returns:} \texttt{list} object with \texttt{obj} appended to \texttt{lst}. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- list()} \\
+\hspace*{5mm} \texttt{temp <- appendToList(temp, handmods[[1]]\$wmean, appendList=TRUE)} \\
+\hspace*{5mm} \texttt{temp <- appendToList(temp, handmods[[2]]\$wmean, appendList=TRUE)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{normalizeVariable} \label{sec_normalizevariable}
+
+\hspace*{5mm} \texttt{normalizeVariable(v)} \\
+
+normalizes a variable (\texttt{numeric} vector) in \texttt{[0,1]}. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{v}: a \texttt{numeric} vector.
+\end{itemize}
+
+\textbf{returns:} normalized \texttt{numeric} vector. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- normalizeVariable(irisdata[,1])} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{binnedEntropy} \label{sec_binnedentropy}
+
+\hspace*{5mm} \texttt{binnedEntropy(v, nbins=100)} \\
+
+uses bins to approximate the empirical entropy of a variable. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{v}: a \texttt{numeric} vector.
+\item \texttt{nbins}: number of bins used to estimate the entropy.
+\end{itemize}
+
+\textbf{returns:} entropy value. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- binnedEntropy(irisdata[,1])} \\
+
+\textbf{see:}
+
+
+
+\subsection{multinomial} \label{sec_multinomial}
+
+\hspace*{5mm} \texttt{multinomial(weights, k)} \\
+
+samples from a k-multinomial.  \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{weights}: \texttt{numeric} vector with the weights of the multinomial. Sum to 1.
+\item \texttt{k}: size of the weight vector.
+\end{itemize}
+
+\textbf{returns:} an integer value in \texttt{[1,k]}, coded as a 1-of-k variable \citep[chap. 9]{bishop06} \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{weights <- c(0.3, 0.5, 0.2)} \\
+\hspace*{5mm} \texttt{multinomial(weights, 3)} \\
+\hspace*{5mm} \texttt{[1] 0 1 0} \\
+
+\textbf{see:} \\
+\citep[chap. 9]{bishop06}
+
+
+
+
+\subsection{mvngen} \label{sec_mvngen}
+
+\hspace*{5mm} \texttt{mvngen(mean, cov, nitem)} \\
+
+sample \texttt{nitem} elements from $\mathcal N(\text{mean}, \text{cov})$. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mean}: \texttt{numeric} vector.
+\item \texttt{cov}: covariance matrix.
+\item \texttt{nitem}: number of items to generate.
+\end{itemize}
+
+\textbf{returns:} \texttt{nitem x d} matrix with elements as rows (further denoted as a matrix of row-elements)  \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{mvngen(c(0, 0), diag(2), 5)} \\
+\hspace*{15mm} \texttt{[,1]}  \hspace*{15mm}     \texttt{[,2]} \\
+\hspace*{5mm} \texttt{[1,] -0.09898211  1.4516438} \\
+\hspace*{5mm} \texttt{[2,]  0.20814926 -0.1233861} \\
+\hspace*{5mm} \texttt{[3,]  0.18410071  0.5995621} \\
+\hspace*{5mm} \texttt{[4,]  0.65994562  0.8328315} \\
+\hspace*{5mm} \texttt{[5,]  2.33098055 -0.5943117} \\
+
+\textbf{see:}
+
+
+
+\subsection{gmmgen} \label{sec_gmmgen}
+
+\hspace*{5mm} \texttt{gmmgen(mod, nitem)} \\
+
+sample elements from a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod}: GMM sampled from.
+\item \texttt{nitem}: number of elements to be sampled.
+\end{itemize}
+
+\textbf{returns:}  \texttt{nitem x d} matrix with elements as rows.  \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- gmmgen(gmmpen[[1]], 50)} \\
+
+\textbf{see:}
+
+
+
+\subsection{mvndensity} \label{sec_mvndensity}
+
+\hspace*{5mm} \texttt{mvndensity(mean, cov, data)} \\
+
+get densities of a set of elements w.r.t a multivariate normal. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mean}: \texttt{numeric} vector, mean of the multivariate normal.
+\item \texttt{cov}: covariance matrix of the multivariate normal.
+\item \texttt{data}: matrix of row-elements.
+\end{itemize}
+
+\textbf{returns:} \texttt{numeric} vector containing densities. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- mvngen(c(0, 0), diag(2), 5)} \\
+\hspace*{5mm} \texttt{mvndensity(c(0,0), diag(2), temp)} \\
+\hspace*{5mm} \texttt{[1] 0.137188286 0.032318242 0.005181099 0.047312602 0.033178600} \\
+
+\textbf{see:}
+
+
+
+\subsection{gmmdensity} \label{sec_gmmdensity}
+
+\hspace*{5mm} \texttt{gmmdensity(mod, data)} \\
+
+get densities of a set of elements w.r.t a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod}: reference GMM.
+\item \texttt{data}: matrix of row-elements.
+\end{itemize}
+
+\textbf{returns:} \texttt{numeric} vector containing densities. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- gmmgen(gmmpen[[1]], 50)} \\
+\hspace*{5mm} \texttt{temp2 <- gmmdensity(gmmpen[[1]], temp)} \\
+
+\textbf{see:}
+
+
+
+\subsection{klmc} \label{sec_klmc}
+
+\hspace*{5mm} \texttt{klmc(mod1, mod2, nsamp=5000)} \\
+
+computes Monte Carlo estimate of KL divergence between GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod1}: GMM parameter to $\text{KL}(\text{mod1} || \text{mod2})$.
+\item \texttt{mod2}: GMM parameter to $\text{KL}(\text{mod1} || \text{mod2})$.
+\item \texttt{nsamp}: number of samples used to build estimate.
+\end{itemize}
+
+\textbf{returns:} KL value. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- klmc(gmmpen[[1]], gmmpen[[2]])} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{jsmc} \label{sec_jsmc}
+
+\hspace*{5mm} \texttt{jsmc(mod1, mod2, nsamp=5000)} \\
+
+computes Monte Carlo estimate of Jensen-Shannon (JS) divergence between GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod1}: GMM parameter to $\text{JS}(\text{mod1} || \text{mod2})$.
+\item \texttt{mod2}: GMM parameter to $\text{JS}(\text{mod1} || \text{mod2})$.
+\item \texttt{nsamp}: number of samples used to build estimate.
+\end{itemize}
+
+\textbf{returns:}  JS divergence value.\\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- jsmc(gmmpen[[1]], gmmpen[[2]])} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{klut} \label{sec_klut}
+
+\hspace*{5mm} \texttt{klut(mod1, mod2)} \\
+
+compute Unscented Transform approximation to KL divergence between GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod1}: GMM parameter to $\text{KL}(\text{mod1} || \text{mod2})$.
+\item \texttt{mod2}: GMM parameter to $\text{KL}(\text{mod1} || \text{mod2})$.
+\end{itemize}
+
+
+\textbf{returns:} KL value.  \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- klut(gmmpen[[1]], gmmpen[[2]])} \\
+
+\textbf{see:}\\
+\citep{goldberger03}
+
+
+
+
+
+\subsection{jsut} \label{sec_jsut}
+
+\hspace*{5mm} \texttt{jsut(mod1, mod2)} \\
+
+compute Unscented Transform approximation to Jensen-Shannon (JS) divergence between GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod1}: GMM parameter to $\text{JS}(\text{mod1} || \text{mod2})$.
+\item \texttt{mod2}: GMM parameter to $\text{JS}(\text{mod1} || \text{mod2})$.
+\end{itemize}
+
+
+\textbf{returns:} JS divergence value.  \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- jsut(gmmpen[[1]], gmmpen[[2]])} \\
+
+\textbf{see:}
+\citep{goldberger03}
+
+
+
+\subsection{covgen} \label{sec_covgen}
+
+\hspace*{5mm} \texttt{covgen(d=2, bounds=c(1, 5))} \\
+
+generates random definite positive matrices (i.e. valid covariance matrices). \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{d}: rank of the square matrix to be returned.
+\item \texttt{bounds}: minima and maximal values for diagonal values.
+\end{itemize}
+
+\textbf{returns:} matrix cells are sampled with an heuristic not guaranteed to lead to definite positiveness: this characteristic is only controlled before function return. If positive definite after control, the matrix is returned. If not, an error message is issued. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- covgen()} \\
+
+\textbf{see:}
+
+
+
+\subsection{rDirichlet} \label{sec_rdirichlet}
+
+\hspace*{5mm} \texttt{rDirichlet(K, alpha=0.1)} \\
+
+samples from the Dirichlet distribution. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{K}: order of the sample.
+\item \texttt{alpha}: $\alpha$ parameter of the distribution (i.e. $\alpha$ repeated K times).
+\end{itemize}
+
+\textbf{returns:} \texttt{numeric} vector, which values are $\in [0,1]$ and sum to 1.
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- rDirichlet(4)} \\
+
+\textbf{see:}
+
+% rdirichlet
+% ddirichlet
+
+
+\subsection{dDirichlet} \label{sec_ddirichlet}
+
+\hspace*{5mm} \texttt{dDirichlet(alpha=0.1, x1, x2)} \\
+
+get density of a sample w.r.t Dirichlet distribution (3D only). \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{alpha}: $\alpha$ parameter of the distribution (i.e. $\alpha$ repeated 3 times).
+\item \texttt{x1}: $1^\text{st}$ dimension of the sample.
+\item \texttt{x2}: $2^\text{nd}$ dimension of the sample.
+\end{itemize}
+
+\textbf{returns:} density value. \\
+
+\textbf{localisation:} misc.utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- dDirichlet(x1=0.4, x2=0.2)} \\
+\hspace*{5mm} \texttt{\# 3rd dimension is 1-x1-x2 = 0.2} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{setDomain} \label{sec_setdomain}
+
+\hspace*{5mm} \texttt{setDomain(dat, span=10, oldspan=NULL)} \\
+
+performs linear rescaling of given data. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{dat}: data to rescale. \texttt{matrix} object, with elements as rows, and variables as columns (i.e. variables are rescaled).
+\item \texttt{span}: new domain to which dat is rescaled. If type is \texttt{numeric} and length = 1: \texttt{[-span, span]} is used for all variables. If type is \texttt{numeric} and length = 2: \texttt{[span[1], span[2]]} is used for all variables. If a \texttt{list} object: \texttt{[span[[1]]$_i$, span[[2]]$_i$]} is used for each variable $i$.
+\item \texttt{oldspan}: if \texttt{NULL}, old domains are computed from \texttt{dat} inspection. Otherwise, is structured as \texttt{span} and replaces inspected values for rescaling.
+\end{itemize}
+
+\textbf{returns:} scaled data matrix. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- setDomain(irisdata, span=15)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{generateSparsePoints} \label{sec_generatesparsepoints}
+
+\hspace*{5mm} \texttt{generateSparsePoints(npoints, dim=2, span=10, mindist=2, maxit=20)} \\
+
+generates a set of points pairwise-separated by a minimal distance. Is not guaranteed to converge: when \texttt{maxit} is reached, current points are returned. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{npoints}: number of points to generate (i.e. in a matrix with elements as rows.
+\item \texttt{dim}: number of variables to generate.
+\item \texttt{span}: \texttt{[-span, span]} is used as bounds to uniform sampling for all variables.
+\item \texttt{mindist}: minimal distance that each element should have with all others. the \texttt{control} C routine is used to perform this verification. All points that do not respect this constraint are resampled.
+\item \texttt{maxit}: maximal number of iterations before current elements are returned.
+\end{itemize}
+
+\textbf{returns:} matrix with well separated elements as its rows. \\
+
+\textbf{localisation:} misc/Rutils.R, \texttt{control} C routine in misc/utils.c \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- generateSparsePoints(10)} \\
+
+\textbf{see:}
+
+
+
+\subsection{buildFrame} \label{sec_buildframe}
+
+\hspace*{5mm} \texttt{buildFrame(datamatrix, labels, dims=1:2)} \\
+
+builds a data frame from a \texttt{matrix} of elements and a vector of \texttt{numeric} labels. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{datamatrix}: matrix of row-elements.
+\item \texttt{labels}: vector of numeric labels.
+\item \texttt{dims}: subset of variables extracted from \texttt{datamatrix}.
+\end{itemize}
+
+\textbf{returns:} built data frame. \\
+
+\textbf{localisation:} graphics/displayScatter.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{irisdata[c(1,7,35,56,131),]} \\
+\hspace*{5mm} \texttt{Sepal.Length Sepal.Width Petal.Length Petal.Width} \\
+\hspace*{5mm} \texttt{[1,]          5.1         3.5          1.4         0.2} \\
+\hspace*{5mm} \texttt{[2,]          4.6         3.4          1.4         0.3} \\
+\hspace*{5mm} \texttt{[3,]          4.9         3.1          1.5         0.2} \\
+\hspace*{5mm} \texttt{[4,]          5.7         2.8          4.5         1.3} \\
+\hspace*{5mm} \texttt{[5,]          7.4         2.8          6.1         1.9} \\
+\hspace*{5mm} \texttt{irislabels[c(1,7,35,56,131)]} \\
+\hspace*{5mm} \texttt{[1] 1 1 1 2 3} \\
+\hspace*{5mm} \texttt{temp <- buildFrame(irisdata, irislabels, dims=1:4)} \\
+
+\textbf{see:}
+
+
+
+
+
+
+\subsection{mixKnn} \label{sec_mixknn}
+
+\hspace*{5mm} \texttt{mixKnn(data, labels, n=2, KLparam=500)} \\
+
+performs k-nearest neighbors over a collection of GMM. It uses \texttt{jsmc} to compute distances. Each elements in \texttt{data} is classified against all the others, and inferred class is compared to the true one (leave-one-out). \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: \texttt{list} of GMM.
+\item \texttt{labels}: vector of \texttt{numeric} labels associated to \texttt{data}.
+\item \texttt{n}: k of the algorithm.
+\item \texttt{KLparam}: number of samples for \texttt{jsmc}.
+\end{itemize}
+
+\textbf{returns:} classification error ratio $\in [0,1]$. \\
+
+\textbf{localisation:} algorithms/knn.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp1 <- sample(1:1243, 150)} \\
+\hspace*{5mm} \texttt{temp2 <- list()} \\
+\hspace*{5mm} \texttt{for(i in temp1) \{} \\
+\hspace*{5mm} \texttt{temp2 <- appendToList(temp2, imgmods[[i]])} \\
+\hspace*{5mm} \texttt{\}} \\
+\hspace*{5mm} \texttt{temp3 <- imglabels[temp1]} \\
+\hspace*{5mm} \texttt{temp4 <- mixKnn(temp2, temp3)} \\
+
+
+\textbf{see:}
+
+
+
+
+\subsection{mergeClassif} \label{sec_mergeclassif}
+
+\hspace*{5mm} \texttt{mergeClassif(data, labels, KLparam=500, rho=new.env())} \\
+
+performs task analogous to \texttt{mixKnn} (i.e. leave-one-out classification), but uses synthetic representatives to infer labels, instead of k-NN. Each representative is obtained by concatenating all GMM (i.e. elements) of a specific label value, and applying \texttt{vbcomp} on this redundant mixture.  \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: \texttt{list} of GMM.
+\item \texttt{labels}: vector of \texttt{numeric} labels associated to \texttt{data}.
+\item \texttt{KLparam}: number of samples for \texttt{jsmc}.
+\item \texttt{rho}: R environment object. Used to issue R commands within the C routine.
+\end{itemize}
+
+\textbf{returns:} classification error ratio $\in [0,1]$. \\
+
+\textbf{localisation:} algorithms/knn.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp1 <- sample(1:1243, 150)} \\
+\hspace*{5mm} \texttt{temp2 <- list()} \\
+\hspace*{5mm} \texttt{for(i in temp1) \{} \\
+\hspace*{5mm} \texttt{temp2 <- appendToList(temp2, imgmods[[i]])} \\
+\hspace*{5mm} \texttt{\}} \\
+\hspace*{5mm} \texttt{temp3 <- imglabels[temp1]} \\
+\hspace*{5mm} \texttt{temp4 <- mergeClassif(temp2, temp3)} \\
+
+
+\textbf{see:}
+
+
+
+\subsection{constrClassif} \label{sec_constrclassif}
+
+\hspace*{5mm} \texttt{constrClassif(data, labels, KLparam=500, rho=new.env())} \\
+
+performs task analogous to \texttt{mixKnn} (i.e. leave-one-out classification), but uses synthetic representatives to infer labels, instead of k-NN. Each representative is obtained by concatenating all GMM (i.e. elements) of a specific label value, and applying \texttt{vbconstr} on this redundant mixture.  \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: \texttt{list} of GMM.
+\item \texttt{labels}: vector of \texttt{numeric} labels associated to \texttt{data}.
+\item \texttt{KLparam}: number of samples for \texttt{jsmc}.
+\item \texttt{rho}: R environment object. Used to issue R commands within the C routine.
+\end{itemize}
+
+\textbf{returns:} classification error ratio $\in [0,1]$. \\
+
+\textbf{localisation:} algorithms/knn.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp1 <- sample(1:1243, 150)} \\
+\hspace*{5mm} \texttt{temp2 <- list()} \\
+\hspace*{5mm} \texttt{for(i in temp1) \{} \\
+\hspace*{5mm} \texttt{temp2 <- appendToList(temp2, imgmods[[i]])} \\
+\hspace*{5mm} \texttt{\}} \\
+\hspace*{5mm} \texttt{temp3 <- imglabels[temp1]} \\
+\hspace*{5mm} \texttt{temp4 <- constrClassif(temp2, temp3)} \\
+
+
+\textbf{see:}
+
+
+
+\subsection{sampleClassif} \label{sec_sampleclassif}
+
+\hspace*{5mm} \texttt{sampleClassif(data, labels, KLparam=500, rho=new.env())} \\
+
+performs task analogous to \texttt{mixKnn} (i.e. leave-one-out classification), but uses synthetic representatives to infer labels, instead of k-NN. Each representative is obtained by concatenating all GMM (i.e. elements) of a specific label value, resampling from this redundant mixture, and applying \texttt{varbayes} on this sample.  \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: \texttt{list} of GMM.
+\item \texttt{labels}: vector of \texttt{numeric} labels associated to \texttt{data}.
+\item \texttt{KLparam}: number of samples for \texttt{jsmc}.
+\item \texttt{rho}: R environment object. Used to issue R commands within the C routine.
+\end{itemize}
+
+\textbf{returns:} classification error ratio $\in [0,1]$. \\
+
+\textbf{localisation:} algorithms/knn.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp1 <- sample(1:1243, 150)} \\
+\hspace*{5mm} \texttt{temp2 <- list()} \\
+\hspace*{5mm} \texttt{for(i in temp1) \{} \\
+\hspace*{5mm} \texttt{temp2 <- appendToList(temp2, imgmods[[i]])} \\
+\hspace*{5mm} \texttt{\}} \\
+\hspace*{5mm} \texttt{temp3 <- imglabels[temp1]} \\
+\hspace*{5mm} \texttt{temp4 <- sampleClassif(temp2, temp3)} \\
+
+
+\textbf{see:}
+
+
+
+
+\subsection{classicEM} \label{sec_classicem}
+
+\hspace*{5mm} \texttt{classicEM(data, k, thres=0.1, maxit=NULL)} \\
+
+estimates a GMM on \texttt{data} using EM algorithm. A lower bound is calculated and monitored at each iteration. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: \texttt{matrix} of row-elements.
+\item \texttt{k}: maximal number of components in the GMM. In case of degeneracies, the final model size may be less than 0.
+\item \texttt{thres}: threshold for lower bound variations between 2 iterations. Convergence is decided if this variation is below \texttt{thres}.
+\item \texttt{maxit}: if \texttt{NULL}, the stopping criterion is related to \texttt{thres}. If not \texttt{NULL}, \texttt{maxit} iterations are performed.
+\end{itemize}
+
+\textbf{returns:} estimated GMM with at most $k$ components, with \texttt{\$labels} containing associated labels for \texttt{data} in addition.  \\
+
+\textbf{localisation:} algorithms/classicEM.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- classicEM(irisdata, 4)} \\
+
+\textbf{see:}\\
+\citep[chap. 9]{bishop06} \\
+\texttt{newGmm}
+
+
+% use harvard refs
+
+\subsection{varbayes} \label{sec_varbayes}
+
+\hspace*{5mm} \texttt{varbayes(data, ncomp, thres=0.1, maxit=NULL)} \\
+
+estimates the variational posterior distribution of a GMM on \texttt{data} using the variational EM algorithm \citep[chap. 10]{bishop06}. A lower bound is calculated and monitored at each iteration. This posterior can be used for various purposes (e.g. MC proposal distribution). It can be transformed using \texttt{extractSimpleModel}, outputing a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: \texttt{matrix} of row-elements.
+\item \texttt{ncomp}: number of components in the posterior.
+\item \texttt{thres}: threshold for lower bound variations between 2 iterations. Convergence is decided if this variation is below \texttt{thres}.
+\item \texttt{maxit}: if \texttt{NULL}, the stopping criterion is related to \texttt{thres}. If not \texttt{NULL}, \texttt{maxit} iterations are performed.
+\end{itemize}
+
+\textbf{returns:} estimated posterior with \texttt{ncomp} components. Structured in a \texttt{list} object as follows:
+\begin{itemize}
+\item \texttt{\$alpha}: hyperparameters influencing the active components in the posterior.
+\item \texttt{\$beta}: hyperparameters regarding shaping of the Normal-Wishart posteriors.
+\item \texttt{\$nu}: hyperparameters regarding shaping of the Normal-Wishart posteriors.
+\item \texttt{\$mean}: hyperparameters regarding shaping of the Normal-Wishart posteriors.
+\item \texttt{\$wish}: hyperparameters regarding shaping of the Normal-Wishart posteriors.
+\end{itemize}
+
+\textbf{localisation:} algorithms/varbayes.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- varbayes(irisdata, 20)} \\
+
+\textbf{see:} \\
+\citep[chap. 10]{bishop06}
+
+
+
+
+
+\subsection{vbcomp} \label{sec_vbcomp}
+
+\hspace*{5mm} \texttt{vbcomp(models, ncomp, thres=0.1, maxit=NULL)} \\
+
+estimates the variational posterior distribution of a GMM that aggregates a collection of GMM.  A lower bound is calculated and monitored at each iteration. This posterior can be used for various purposes (e.g. MC proposal distribution). It can be transformed using \texttt{extractSimpleModel}, outputing a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{models}: GMM made with the weighted sum of the collection of GMM to aggregate.
+\item \texttt{ncomp}: number of components in the posterior.
+\item \texttt{thres}: threshold for lower bound variations between 2 iterations. Convergence is decided if this variation is below \texttt{thres}.
+\item \texttt{maxit}: if \texttt{NULL}, the stopping criterion is related to \texttt{thres}. If not \texttt{NULL}, \texttt{maxit} iterations are performed.
+\end{itemize}
+
+
+\textbf{returns:} estimated posterior with \texttt{ncomp} components.  \\
+
+\textbf{localisation:} algorithms/vbcomp.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp1 <- newGmm()} \\
+\hspace*{5mm} \texttt{for(i in 1:10) temp1 <- appendToGmm(temp1, gmmpen[[i]])} \\
+\hspace*{5mm} \texttt{temp2 <- vbcomp(temp1, 50)} \\
+
+\textbf{see:} \\
+\citep{Bruneau09a}
+
+
+
+\subsection{vbconstr} \label{sec_vbconstr}
+
+\hspace*{5mm} \texttt{vbconstr(models, ncomp, thres=0.1, maxit=NULL)} \\
+
+estimates the variational posterior distribution of a GMM that aggregates a constrained collection of GMM.  A lower bound is calculated and monitored at each iteration. This posterior can be used for various purposes (e.g. MC proposal distribution). It can be transformed using \texttt{extractSimpleModel}, outputing a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{models}: GMM made with the weighted sum of the collection of GMM to aggregate. \texttt{\$a} is used to model constraints between components in this GMM.
+\item \texttt{ncomp}: number of components in the posterior.
+\item \texttt{thres}: threshold for lower bound variations between 2 iterations. Convergence is decided if this variation is below \texttt{thres}.
+\item \texttt{maxit}: if \texttt{NULL}, the stopping criterion is related to \texttt{thres}. If not \texttt{NULL}, \texttt{maxit} iterations are performed.
+\end{itemize}
+
+
+\textbf{returns:} estimated posterior with \texttt{ncomp} components.  \\
+
+\textbf{localisation:} algorithms/vbconstr.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp1 <- newGmm()} \\
+\hspace*{5mm} \texttt{for(i in 1:10) temp1 <- appendToGmm(temp1, gmmpen[[i]])} \\
+\hspace*{5mm} \texttt{temp2 <- vbconstr(temp1, 50)} \\
+
+\textbf{see:} \\
+\citep{Bruneau09a}
+
+
+
+\subsection{mppca} \label{sec_mppca}
+
+\hspace*{5mm} \texttt{mppca(data, ncomp, thres=0.1, maxit=NULL, qmax=NULL} \\
+
+estimates the variational posterior distribution of a MPPCA on a data set. A lower bound is calculated and monitored at each iteration. This posterior can be used for various purposes (e.g. MC proposal distribution). It can be transformed using \texttt{mppcaToGmm} and \texttt{subMppca}, outputing a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: \texttt{matrix} of row-elements.
+\item \texttt{ncomp}: number of components in the posterior.
+\item \texttt{thres}: threshold for lower bound variations between 2 iterations. Convergence is decided if this variation is below \texttt{thres}.
+\item \texttt{maxit}: if \texttt{NULL}, the stopping criterion is related to \texttt{thres}. If not \texttt{NULL}, \texttt{maxit} iterations are performed.
+\item \texttt{qmax}: maximal rank of the posterior factor matrices. If \texttt{NULL}, is set to $d-1$.
+\end{itemize}
+
+\textbf{returns:} estimated posterior MPPCA with \texttt{ncomp} components. \\
+
+\textbf{localisation:} algorithms/mppca.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- mppca(pendat, 100, maxit=30, qmax=8)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{mmppca} \label{sec_mmppca}
+
+\hspace*{5mm} \texttt{mmppca(mods, ncomp, thres=0.1, maxit=NULL)} \\
+
+estimates the variational posterior distribution of a MPPCA that aggregates a collection of input MPPCA models. A lower bound is calculated and monitored at each iteration. This posterior can be used for various purposes (e.g. MC proposal distribution). It can be transformed using \texttt{mppcaToGmm} and \texttt{subMppca}, outputing a GMM. The maximal rank of output factor matrices is determined by the inputs.  \\
+
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mods}: input MPPCA that concatenates the set of components to aggregate.
+\item \texttt{ncomp}: number of components in the posterior.
+\item \texttt{thres}: threshold for lower bound variations between 2 iterations. Convergence is decided if this variation is below \texttt{thres}.
+\item \texttt{maxit}: if \texttt{NULL}, the stopping criterion is related to \texttt{thres}. If not \texttt{NULL}, \texttt{maxit} iterations are performed.
+\end{itemize}
+
+\textbf{returns:} estimated posterior MPPCA with \texttt{ncomp} components. \\
+
+\textbf{localisation:} algorithms/mmppca.c, interfaces.R\\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- newMppca()} \\
+\hspace*{5mm} \texttt{for(i in 1:10) temp <- appendToMppca(temp, pcapen[[i]])} \\
+\hspace*{5mm} \texttt{temp2 <- mmppca(temp, 100, maxit=30)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{gmmkmsock} \label{sec_gmmkmsock}
+
+\hspace*{5mm} \texttt{gmmkmsock(models, names, ngroups, rho=new.env(), host="127.0.0.1")} \\
+
+perform k-means specifically designed for a set of GMM \citep{bruneau10d}. At each iteration, sends information about current prototypes to a server via a socket connection \citep[see]{bruneau10d} for info about protocol.  \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{models}: \texttt{list} of GMM objects.
+\item \texttt{names}: \texttt{character} vector with respective names of the GMM objects.
+\item \texttt{ngroups}: (maximal) number of clusters.
+\item \texttt{rho}: R environment object, used for calls to R functions within C code.
+\item \texttt{host}: IP address of the server for the socket (port 1979).
+\end{itemize}
+
+\textbf{returns:} a set of GMM prototypes, and inferred labels (i.e. associated to the input objects). \\
+
+\textbf{localisation:} algorithms/gmmkmsock.cpp, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp1 <- sample(1:1243, 150)}\\
+\hspace*{5mm} \texttt{temp2 <- list()}\\
+\hspace*{5mm} \texttt{for(i in 1:length(temp1)) temp2 <- appendToList(temp2, imgmods[[temp1[i]]])}\\
+\hspace*{5mm} \texttt{temp3 <- imgnames[temp1]}\\
+\hspace*{5mm} \texttt{temp4 <- gmmkmsock(temp2, temp3, 5)}\\
+
+\hspace*{5mm} \texttt{\# messages are sent to the server using the following protocol: }\\
+\hspace*{5mm} \texttt{TEMPOSPRING 1.0$\backslash \text{n}$}\\
+\hspace*{5mm} \texttt{0/[path\_to\_1st\_closest\_element\_for\_centroid\_0]}\\
+\hspace*{5mm} \texttt{\#[path\_to\_2nd\_closest\_element\_for\_centroid\_0]}\\
+\hspace*{5mm} \texttt{\#[... up to 4]/[path\_to\_2nd\_farthest\_element\_for\_centroid\_0]\#[... up to 4]} \\
+\hspace*{5mm} \texttt{/1/[... for all centroids]/$\backslash \text{n}$}\\
+\hspace*{5mm} \texttt{[pairwise\_distance\_centroids\_0\_and\_1\_formatted\_x.xxxe+-xx]}\\
+\hspace*{5mm} \texttt{[pairwise\_distance\_centroids\_0\_and\_2][... for all n(n-1)/2 possibilities]/\#}\\
+
+
+\textbf{see:}\\
+\citep{bruneau10d}
+
+
+\subsection{pca} \label{sec_pca}
+
+\hspace*{5mm} \texttt{pca(dat, ncomp=NULL)} \\
+
+transforms a data set, and returns coordinates in the principal basis. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{dat}: \texttt{matrix} of row-elements.
+\item \texttt{ncomp}: number of retained variables in the output result. If \texttt{NULL}, all transformed variables are returned.
+\end{itemize}
+
+\textbf{returns:} \texttt{matrix} of transformed row-elements. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- pca(irisdata, 3)} \\
+
+\textbf{see:} \\
+for a review of PCA, and probabilistic variants, see \citep{tipping99, bruneau10, bruneau10b}.
+
+
+
+
+\subsection{getCouple} \label{sec_getcouple}
+
+\hspace*{5mm} \texttt{couple(vec1, vec2)} \\
+
+computes classification error function described in \citep{fowlkes83, picarougne07}, a.k.a couple error. In brief, evaluates how elements are gathered similarly, irrespectively of exact label values (adapted to clustering). \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{vec1}: vector of \texttt{numeric} labels.
+\item \texttt{vec2}: vector of \texttt{numeric} labels.
+\end{itemize}
+
+\textbf{returns:} classification error $\in [0,1]$. \\
+
+\textbf{localisation:} data/couple.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- classicEM(irisdata, 4)} \\
+\hspace*{5mm} \texttt{getCouple(temp\$labels, irislabels)} \\
+\hspace*{5mm} \texttt{[1] 0.1524832} \\
+
+\textbf{see:}
+
+
+
+\subsection{getLabels} \label{sec_getlabels}
+
+\hspace*{5mm} \texttt{getLabels(model, data)} \\
+
+gets numeric labels that associates a data set and a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{model}: GMM.
+\item \texttt{data}: matrix of row-elements.
+\end{itemize}: 
+
+\textbf{returns:} vector of \texttt{numeric} labels, that take values of the respective component indexes in the GMM. \\
+
+\textbf{localisation:} data/getLabels.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- classicEM(irisdata, 4)} \\
+\hspace*{5mm} \texttt{temp2 <- getLabels(temp, irisdata)} \\
+
+\textbf{see:}
+
+
+
+\subsection{getResp} \label{sec_getresp}
+
+\hspace*{5mm} \texttt{getResp(data, model)} \\
+
+get posterior responsibilities of elements in a data set, according to a posterior MPPCA distribution. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: \texttt{matrix} of row-elements.
+\item \texttt{model}: posterior MPPCA.
+\end{itemize}
+
+\textbf{returns:} \texttt{nxk} matrix (with \texttt{n} the number of row-elements, and \texttt{k} the number of components in the MPPCA) of membership probabilities. (i.e. $\bold Z$ in \citep{bruneau10, bruneau10b}) \\
+
+\textbf{localisation:} algorithms/mppca.cpp, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- getResp(pendat, pcapen[[1]])} \\
+
+\textbf{see:}\\
+\texttt{mppca}\\
+\texttt{mmppca}
+
+
+\subsection{extractSimpleModel} \label{sec_extractsimplemodel}
+
+\hspace*{5mm} \texttt{extractSimpleModel(model, labels)} \\
+
+extracts a GMM from a posterior variational distribution. Only relevant components (i.e. associated to a significant population) are extracted. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{model}: variational posterior.
+\item \texttt{labels}: boolean indicating wether to extract a label vector. If \texttt{TRUE}, \texttt{model}, a \texttt{list} object, should also contain a \texttt{\$data} attribute, used to build label vector.
+\end{itemize}
+
+\textbf{returns:} GMM object. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R\\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- varbayes(irisdata, 20)} \\
+\hspace*{5mm} \texttt{temp2 <- extractSimpleModel(temp)} \\
+
+\textbf{see:}
+
+
+
+\subsection{subVarbayes} \label{sec_subvarbayes}
+
+\hspace*{5mm} \texttt{subVarbayes(model, thres=2.001)} \\
+
+filters a variational posterior GMM, keeping only components with sufficient support.  \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{model}: variational posterior GMM.
+\item \texttt{thres}: minimal support for component selection.
+\end{itemize}
+
+\textbf{returns:} filtered variational posterior GMM. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- varbayes(irisdata, 20)} \\
+\hspace*{5mm} \texttt{temp2 <- subVarbayes(temp)} \\
+
+\textbf{see:}
+
+
+
+\subsection{incremMerge} \label{sec_incremmerge}
+
+\hspace*{5mm} \texttt{incremMerge(modref, newmod, k=200, nit=100, quick=FALSE)} \\
+
+updates a reference MPPCA model with an input distribution. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{modref}: reference MPPCA to update.
+\item \texttt{newmod}: new MPPCA to incorporate.
+\item \texttt{k}: number of components of the output variational posterior.
+\item \texttt{nit}: number of iterations used in the \texttt{mmppca} call that performs the update.
+\item \texttt{quick}: boolean parameter transmitted to the \texttt{subMppca} routine that shrinks the output variational posterior.
+\end{itemize}
+
+\textbf{returns:} updated variational posterior. \\
+
+\textbf{localisation:} misc.Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- incremMerge(pcapen[[1]], pcapen[[2]], quick=T)} \\
+
+\textbf{see:}
+
+
+
+\subsection{ZtoLabels} \label{sec_ztolabels}
+
+\hspace*{5mm} \texttt{ZtoLabels(resp)} \\
+
+converts a responsibility matrix ($\bold Z$ in \citep[chap. 9]{bishop06}) to a vector of \texttt{numeric} labels. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{resp}: responsibility matrix to convert.
+\end{itemize}
+
+\textbf{returns:} labels vector. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- getResp(pendat, pcapen[[2]])} \\
+\hspace*{5mm} \texttt{temp2 <- ZtoLabels(temp)} \\
+
+\textbf{see:}
+
+
+
+\subsection{getDataLikelihood} \label{sec_getdatalikelihood}
+
+\hspace*{5mm} \texttt{getDataLikelihood(gmm, dat)} \\
+
+gets log-likelihoods associated to a matrix of row-elements. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{gmm}: GMM object.
+\item \texttt{dat}: matrix of row-elements.
+\end{itemize}
+
+\textbf{returns:} numeric vector of log-likelihoods. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- getDataLikelihood(gmmpen[[3]], pendat} \\
+
+\textbf{see:}
+
+
+
+\subsection{getBic} \label{sec_getbic}
+
+\hspace*{5mm} \texttt{getBic(gmm, dat)} \\
+
+computes BIC criterion \citep{schwarz78} for a specific GMM and data set.  \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{gmm}: GMM object.
+\item \texttt{dat}: matrix of row-elements.
+\end{itemize}
+
+\textbf{returns:} BIC estimate. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- getBic(gmmpen[[1]], pendat)} \\
+
+\textbf{see:}\\
+\citep{schwarz78}
+
+
+\subsection{getVarbayesResp} \label{sec_getvarbayesresp}
+
+\hspace*{5mm} \texttt{getVarbayesResp(data, model)} \\
+
+gets posterior responsibilities for a data set, according to the variational posterior of a GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: matrix of row-elements.
+\item \texttt{model}: variational posterior of a GMM
+\end{itemize}
+
+\textbf{returns:} responsibility matrix ($\bold Z$ in \citep[chap. 10]{bishop06}) resulting from the parameters. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- getVarbayesResp(pendat, vbpen[[2]])} \\
+
+\textbf{see:}
+
+
+
+\subsection{getTimestamp} \label{sec_gettimestamp}
+
+\hspace*{5mm} \texttt{getTimestamp()} \\
+
+returns current timestamp. \\
+
+\textbf{parameters:} none \\
+
+\textbf{returns:} numeric vector with seconds and milliseconds since epoch. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- getTimestamp()} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{getElapsed} \label{sec_getElapsed}
+
+\hspace*{5mm} \texttt{getElapsed(stamp)} \\
+
+get elapsed time since the moment defined by the parameter. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{stamp}: timestamp of a specific moment, obtained with \texttt{getTimestamp}.
+\end{itemize}
+
+\textbf{returns:} numeric vector with seconds and milliseconds of elapsed time. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- getTimestamp()} \\
+\hspace*{5mm} \texttt{temp2 <- getElapsed(temp)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{sort\_index} \label{sec_sort_index}
+
+\hspace*{5mm} \texttt{sort\_index(vec, order=0)} \\
+
+returns indexes associated to the sorted values of the parameter vector. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{vec}: vector to be sorted.
+\item \texttt{order}: if 0, ascending order, if 1, descending order.
+\end{itemize}
+
+\textbf{returns:} indexes associated to the sorted input vector. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- rnorm(10)} \\
+\hspace*{5mm} \texttt{temp2 <- sort\_index(temp)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{getPointer} \label{sec_getpointer}
+
+\hspace*{5mm} \texttt{getPointer(object)} \\
+
+gets the internal R pointer (Integer value) to any object. \textbf{Warning}: direct usage of internal R pointers should be made with great care. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{object}: any R object.
+\end{itemize}
+
+\textbf{returns:} the internal R pointer to the memory storage of the object (stored in a Integer value). \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- rnorm(10)} \\
+\hspace*{5mm} \texttt{temp2 <- getPointer(temp)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{getSEXP} \label{sec_getsexp}
+
+\hspace*{5mm} \texttt{getSEXP(pointer)} \\
+
+returns the object associated to an internal R pointer. \textbf{Warning}: direct usage of internal R pointers should be made with great care. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{pointer}: Integer pointer to an R object.
+\end{itemize}
+
+\textbf{returns:} a reference to the actual R object. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- rnorm(10)} \\
+\hspace*{5mm} \texttt{temp2 <- getPointer(temp)} \\
+\hspace*{5mm} \texttt{temp3 <- getSEXP(temp2)} \\
+
+
+\textbf{see:}
+
+
+
+
+\subsection{datagen} \label{sec_datagen}
+
+\hspace*{5mm} \texttt{datagen(dreal=2, deff=6, npts=200, noise=0.1, genmean=rep(0, dreal), genspan=6, iso=F)} \\
+
+generates data from a random multivariate Gaussian, and adds redundant dimensions by random linear combinations with noise. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{dreal}: dimensionality of the multivariate Gaussian.
+\item \texttt{deff}: dimensionality of the returned sample.
+\item \texttt{npts}: number of elements to be sampled.
+\item \texttt{noise}: noise magnitude for the linear combination.
+\item \texttt{genmean}: mean of the multivariate Gaussian.
+\item \texttt{genspan}: maximal magnitude of the diagonal elements in the covariance matrix. Non-diagonal elements are sampled under constraints of positive-definiteness.
+\item \texttt{iso}: sample from an isotropic multivariate Gaussian (i.e. diagonal covariance matrix).
+\end{itemize}
+
+\textbf{returns:} matrix of sampled row-elements. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- datagen()} \\
+
+\textbf{see:}
+
+
+
+\subsection{circlegen} \label{sec_circlegen}
+
+\hspace*{5mm} \texttt{circlegen(npts=200, radius=10, noise=1)} \\
+
+generate data elements along a 2D circle with additional noise. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{npts}: number of elements to generate.
+\item \texttt{radius}: radius of the circle.
+\item \texttt{noise}: determines the width of the circle stroke.
+\end{itemize}
+
+\textbf{returns:} matrix of sampled row-elements. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- circlegen()} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{spiralgen} \label{sec_spiralgen}
+
+\hspace*{5mm} \texttt{spiralgen(radius=10, n=1000, laps=2, noise=1)} \\
+
+generates data elements along a spiral with additional noise. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{radius}: determines the radius of a spiral revolution.
+\item \texttt{n}: number of elements to generate.
+\item \texttt{laps}: number of revolutions of the spiral.
+\item \texttt{noise}: determines the width of the spiral stroke.
+\end{itemize}
+
+\textbf{returns:} matrix of sampled row-elements. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- spiralgen()} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{generate2Dtransform} \label{sec_generate2dtransform}
+
+\hspace*{5mm} \texttt{generate2Dtransform(dims=4))} \\
+
+generate a random matrix to transform a 2D signal to higher dimensional spaces. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{dims}: dimensionality of the target space.
+\end{itemize}
+
+\textbf{returns:} a \texttt{dims x 2} matrix defining the transform. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- generate2Dtransform()} \\
+
+\textbf{see:}
+
+
+
+
+
+\subsection{dat1sample} \label{sec_dat1sample}
+
+\hspace*{5mm} \texttt{dat1sample(nelts, gmm, noise, transform, oldbounds=NULL, newbounds=NULL)} \\
+
+generates data elements according to SYN1 process (sample from a 2D GMM, linearly transformed with additive noise). \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{nelts}: number of elements to generate.
+\item \texttt{gmm}: 2D GMM to be sampled from.
+\item \texttt{noise}: additive noise magnitude.
+\item \texttt{transform}: matrix defining linear transform.
+\item \texttt{oldbounds}: optional argument for sample rescaling. If not \texttt{NULL}, transmitted to \texttt{setDomain} as \texttt{oldspan}.
+\item \texttt{newbounds}: optional argument for sample rescaling. If not \texttt{NULL}, transmitted to \texttt{setDomain} as \texttt{newspan}.
+\end{itemize}
+
+\textbf{returns:} matrix of sampled row-elements. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- dat1sample(500, randomGmm(), 1, generate2Dtransform())} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{dat2sample} \label{sec_dat2sample}
+
+\hspace*{5mm} \texttt{dat2sample(nelts, radius, noise, oldbounds=NULL, newbounds=NULL)} \\
+
+generates data elements according to SYN2 process (sample along a semi-sphere with additive noise). \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{nelts}: number of elements to generate.
+\item \texttt{radius}: radius of the sphere to sample from.
+\item \texttt{noise}: additive noise magnitude.
+\item \texttt{oldbounds}: optional argument for sample rescaling. If not \texttt{NULL}, transmitted to \texttt{setDomain} as \texttt{oldspan}.
+\item \texttt{newbounds}: optional argument for sample rescaling. If not \texttt{NULL}, transmitted to \texttt{setDomain} as \texttt{newspan}.
+\end{itemize}
+
+\textbf{returns:} matrix of sampled row-elements. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- dat2sample(500, 10, 1)} \\
+
+\textbf{see:}
+
+
+
+\subsection{dat3sample} \label{sec_dat3sample}
+
+\hspace*{5mm} \texttt{dat3sample(nelts, radius, noise, transform, oldbounds=NULL, newbounds=NULL)} \\
+
+generates data elements according to SYN3 process (sample along a 2D circle with additive noise, and linearly transform to higher dimensional space with further noise addition). \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{nelts}: number of elements to generate.
+\item \texttt{radius}: radius of the sphere to sample from.
+\item \texttt{noise}: additive noise magnitude.
+\item \texttt{transform}: matrix defining linear transform.
+\item \texttt{oldbounds}: optional argument for sample rescaling. If not \texttt{NULL}, transmitted to \texttt{setDomain} as \texttt{oldspan}.
+\item \texttt{newbounds}: optional argument for sample rescaling. If not \texttt{NULL}, transmitted to \texttt{setDomain} as \texttt{newspan}.
+\end{itemize}
+
+
+
+\textbf{returns:} matrix of sampled row-elements. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- dat3sample(500, 10, 1, generate2Dtransform())} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{plotGmm} \label{sec_plotgmm}
+
+\hspace*{5mm} \texttt{plotGmm(mod)} \\
+
+3D density plot of a 2D GMM. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mod}: GMM object to plot 
+\end{itemize}
+
+\textbf{returns:} a new plotting window with the 3D density plot. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{plotGmm(randomGmm())} \\
+
+\textbf{see:}
+
+
+
+
+
+\subsection{displayScatter} \label{sec_displayscatter}
+
+\hspace*{5mm} \texttt{displayScatter(data=NULL, model=NULL, labels=NULL, datasizes=NULL, compcolors=NULL, complabels=NULL, compstrokes="solid", space=1:2, xlim=NULL, ylim=NULL, main="", xlab="", ylab="", smooth=FALSE, alphacol=0.8, alphanocol=0.5, cex.lab=1, lwd=1)} \\
+
+general plotting function for data sets (matrix of row-elements), optionally associated to labels and a GMM. Labels influence the color and symbols of plotted data points. Gaussian envelopes of the components in the GMM are drawn. NB: data set and GMM arguments cannot be both \texttt{NULL}. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{data}: matrix of row-elements. If \texttt{NULL}, the GMM is plotted alone.
+\item \texttt{model}: GMM object. 
+\item \texttt{labels}: vector of numeric labels. May alternatively be present as a member of \texttt{model}, \texttt{\$labels}.
+\item \texttt{datasizes}: vector of integer magnification factors for data symbols. If length=1, same coefficient applies to all points.
+\item \texttt{compcolors}: vector of integer color indexes. These indexes are internally associated to one color among a set of appropriately chosen ones. If length=1, all GMM components are colored the same way. If length=k, each component is associated to its own color index. This k-length vector may contain \texttt{NA} values: associated components will be white-colored.
+\item \texttt{complabels}: \texttt{character} vector containing text strings to be printed over Gaussian envelopes.
+\item \texttt{compstrokes}: this \text{character} vector may be used to specify non default strokes for envelopes.
+\item \texttt{space}: this function prints a 2D scatterplot. If data and model have higher dimensionality, this argument specifies the axes to be printed.
+\item \texttt{xlim}: bounds for the first variable. If \texttt{NULL}, will be inferred from available data.
+\item \texttt{ylim}: bounds for the second variable. If \texttt{NULL}, will be inferred from available data.
+\item \texttt{main}: main label for the plotting window.
+\item \texttt{xlab}: label for the x-axis.
+\item \texttt{ylab}: label for the y-axis.
+\item \texttt{smooth}: if \texttt{TRUE}, display the response to a kernel density function, instead of symbols for data elements.
+\item \texttt{alphacol}: alpha blending parameter when a component is non-white colored.
+\item \texttt{alphanocol}: alpha blending parameter when a component is white colored.
+\item \texttt{cex.lab}: magnification factor for all text in the plotting window.
+\item \texttt{lwd}: width of the stroke used for data symbols.
+\end{itemize}
+
+\textbf{returns:} a new plotting window displaying the data set and associated model. \\
+
+\textbf{localisation:} graphics/displayScatter.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{displayScatter(irisdata, NULL, irislabels)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{displayGraph} \label{sec_displaygraph}
+
+\hspace*{5mm} \texttt{displayGraph(measure, dev, vect, xlab="K", ylab="measure", main=" ")} \\
+
+displays a curve (vect, measure), and associated deviations. Typically used to present experimental results. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{measure}: y-axis for the curve.
+\item \texttt{dev}: deviations for the y-axis measures.
+\item \texttt{vect}: x-axis for the curve.
+\item \texttt{xlab}: label for x-axis.
+\item \texttt{ylab}: label for y-axis.
+\item \texttt{main}: main label for the plotting window.
+\end{itemize}
+
+\textbf{returns:} a new plotting window displaying the curve. \\
+
+\textbf{localisation:} graphics/displayGraph.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{displayGraph(rnorm(10, mean=4, sd=3), rnorm(10, mean=0, sd=0.5), 1:10)} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{displaySVM} \label{sec_displaysvm}
+
+\hspace*{5mm} \texttt{displaySVM(svm.model, dataframe, displayPoints=TRUE, subset=NULL, steps=100, alpha=0.4, lwd=1)} \\
+
+displays the colored decision regions of a SVM model. Data symbols are also optionally displayed. Data and model should be 2D.\\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{svm.model}: a SVM model, as returned by \texttt{svm} (\texttt{e1071} library)
+\item \texttt{dataframe}: \texttt{data.frame} object, containing row-elements, and associated labels in the last variable.
+\item \texttt{displayPoints}: if \texttt{FALSE}, only decision regions are displayed.
+\item \texttt{subset}: vector of indexes of a data subset to be displayed. If \texttt{NULL}, all points are displayed.
+\item \texttt{steps}: influences the resolution of the decision regions. Low values will provoke aliasing, high values are slower to be displayed.
+\item \texttt{alpha}: alpha blending parameter between decision regions and data symbols.
+\item \texttt{lwd}: magnification factor for the stroke width used to plot symbols.
+\end{itemize}
+
+\textbf{returns:} a new plotting window displaying SVM decision regions. \\
+
+\textbf{localisation:} graphics/displayScatter.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{\# extract 2 first variables and build data.frame} \\
+\hspace*{5mm} \texttt{temp <- buildFrame(irisdata, irislabels)} \\
+\hspace*{5mm} \texttt{iris.model <- svm(labels $\sim$  ., data=temp, cost=100, gamma=1)} \\
+\hspace*{5mm} \texttt{displaySVM(iris.model, temp)} \\
+
+\textbf{see:}
+
+
+
+
+
+
+\subsection{displayNnet} \label{sec_displaynnet}
+
+\hspace*{5mm} \texttt{displayNnet(nnet.model, datamatrix, datalabels, subset=NULL, displayPoints=TRUE, steps=100, alpha=0.4, lwd=1)} \\
+
+displays the colored decision regions of a neural network model. Data symbols are also optionally displayed. Data and model should be 2D. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{nnet.model}: a neural network model, as returned by \texttt{nnet} (\texttt{nnet} library)
+\item \texttt{datamatrix}: a matrix of row-elements.
+\item \texttt{datalabels}: matrix of binary indicator variables for labels (as used by \texttt{nnet}).
+\item \texttt{subset}: vector of indexes of a data subset to be displayed. If \texttt{NULL}, all points are displayed.
+\item \texttt{displayPoints}: if \texttt{FALSE}, only decision regions are displayed.
+\item \texttt{steps}: influences the resolution of the decision regions. Low values will provoke aliasing, high values are slower to be displayed.
+\item \texttt{alpha}: alpha blending parameter between decision regions and data symbols.
+\item \texttt{lwd}: magnification factor for the stroke width used to plot symbols.
+\end{itemize}
+
+\textbf{returns:} a new plotting window displaying decision regions associated to the parametrized neural network. \\
+
+\textbf{localisation:} graphics/displayScatter.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- class.ind(irislabels)} \\
+\hspace*{5mm} \texttt{temp2 <- setDomain(irisdata[,1:2], 10)} \\
+\hspace*{5mm} \texttt{temp3 <- nnet(temp2, temp, size=10)} \\
+\hspace*{5mm} \texttt{displayNnet(temp3, temp2, temp)} \\
+
+\textbf{see:}
+
+
+
+\subsection{Rdct} \label{sec_rdct}
+
+\hspace*{5mm} \texttt{Rdct(vect)} \\
+
+performs DCT on a real vector. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{vect}: vector of real values.
+\end{itemize}
+
+\textbf{returns:} vector of DCT transformed values. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- Rdct(irisdata[,1])} \\
+
+\textbf{see:}
+
+
+
+\subsection{Rdct2D} \label{sec_rdct2d}
+
+\hspace*{5mm} \texttt{Rdct2D(mat)} \\
+
+performs 2D DCT on a real matrix. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mat}: matrix of real values.
+\end{itemize}
+
+\textbf{returns:} matrix of DCT transformed values. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- Rdct2D(irisdata)} \\
+
+\textbf{see:}
+
+
+
+\subsection{RinvDct2D} \label{sec_rinvdct2d}
+
+\hspace*{5mm} \texttt{RinvDct2D(mat)} \\
+
+performs inverse 2D DCT on a real matrix. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{mat}: matrix of real values.
+\end{itemize}
+
+\textbf{returns:} matrix of inverse DCT transformed values. \\
+
+\textbf{localisation:} misc/utils.c, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- RinvDct2D(Rdct2D(irisdata))} \\
+
+\textbf{see:}
+
+
+
+
+\subsection{RGBtoLab} \label{sec_rgbtolab}
+
+\hspace*{5mm} \texttt{RGBtoLab(filename, filterWhite=FALSE, addCoords=TRUE)} \\
+
+transform a .ppm file into a matrix of (L,a,b) pixel intensities (1 row-element per pixel). \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{filename}: path to .ppm file (as build by \texttt{names.pl}. Alternatively, if needed, R file path manipulating routines are documented in document \texttt{r-lang.pdf}, section 7.1)
+\item \texttt{filterWhite}: if \texttt{TRUE}, filter white points from result to return.
+\item \texttt{addCoords}: if \texttt{TRUE}, append 2 normalized (x,y) coordinates for each pixel.
+\end{itemize}
+
+\textbf{returns:} matrix of pixel row-elements. \\
+
+\textbf{localisation:} graphics/RGBtoLab.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- RGBtoLab(imgnames[[2]]), filterWhite=TRUE)} \\
+
+\textbf{see:} \\
+In order to save space, images associated to names in \texttt{imgnames} were not provided in this bundle.
+Caltech-256 should be retrieved first, and then values in \texttt{imgnames} associated to relevants file paths, before using \texttt{RGBtoLab}.
+
+
+
+
+\subsection{readPixmapFile} \label{sec_readpixmapfile}
+
+\hspace*{5mm} \texttt{readPixmapFile(name)} \\
+
+extracts a list of pixmap objects from the handwritten digits file format provided in \citep{lecun98}. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{name}: path to the file.
+\end{itemize}
+
+\textbf{returns:} a list of pixmapGrey objects. \\
+
+\textbf{localisation:} data/readDataFile.cpp, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- readPixmapFile(file.path(VBmixwd, "data/train-images-idx3-ubyte"))} \\
+
+\textbf{see:}\\
+\citep{lecun98} \\
+The file train-... may be found at (ref).
+
+
+
+\subsection{readLabelFile} \label{sec_readlabelfile}
+
+\hspace*{5mm} \texttt{readLabelFile(name)} \\
+
+reads the vector of numeric labels contained in a binary file. Labels are associated to handwritten digits, thus $\in [0-9]$. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{name}: path to the file.
+\end{itemize}
+
+\textbf{returns:} vector of digit labels. \\
+
+\textbf{localisation:} data/readLabelFile.cpp, interfaces.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- readLabelFile(file.path(VBmixwd, "data/train-labels-idx1-ubyte"))} \\
+
+\textbf{see:} \\
+The file train-... may be downloaded at (ref).
+
+
+
+\subsection{reBuild} \label{sec_rebuild}
+
+\hspace*{5mm} \texttt{reBuild(v, voids, nonvoids, domains, placeholder=1)} \\
+
+re-build a pixmapGrey object from a vector of pixel intensities. As some pixels may be irrelevant over a collection of images (e.g. pixel always white in handwritten digits), some variables may have been filtered or transformed before performing some machine learning process. These transforms are indicated as parameters, and give clues to recover objects in the original image space. NB: assumes that \texttt{v} is scaled in $[-10,10]$. Additional transformations may thus be performed as appropriate before using this function. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{v}: vector to be converted to a pixmapGrey object.
+\item \texttt{voids}: vector of position indices in the original signal (i.e. 2D matrix with its columns casted in a vector) that did not carry any information. Replaced by a placeholder in recovered image.
+\item \texttt{nonvoids}: vector of positions to which \texttt{v} should be associated in the recovered image.
+\item \texttt{domains}: original data domains of pixel intensities prior to being transformed to \texttt{v}'s domain. Permit appropriate reconstruction in the domain of pixel intensities used by \texttt{pixmap} (i.e. subset of $[0,1]$). Formatted similarly to what is required in \texttt{setDomain}.
+\item \texttt{placeholder}: placeholder value for pixel positions present in \texttt{voids}.
+\end{itemize}
+
+\textbf{returns:} pixmapGrey reconstructed object. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- reBuild(handdat[123,], handvoid, handnonvoid, handdomains)} \\
+
+\textbf{see:}
+
+
+
+
+
+
+\subsection{pixmapToVector} \label{sec_pixmaptovector}
+
+\hspace*{5mm} \texttt{pixmapToVector(p)} \\
+
+converts a pixmapGrey object to a numeric vector. The pixel matrix is casted to a vector by appending successive columns. \\
+
+\textbf{parameters:}
+
+\begin{itemize}
+\item \texttt{p}: pixmapGrey object.
+\end{itemize}
+
+\textbf{returns:} numeric vector containing pixel intensities. \\
+
+\textbf{localisation:} misc/Rutils.R \\
+
+\textbf{example:} \\
+\hspace*{5mm} \texttt{temp <- readPixmapFile(file.path(VBmixwd, "data/train-images-idx3-ubyte"))} \\
+\hspace*{5mm} \texttt{temp2 <- pixmapToVector(temp[[3]])} \\
+
+\textbf{see:} \\
+The file train-... may be downloaded at (ref).
+
+
+
+
+
+
+
+\section{data sets index} \label{sec_datasets}
+
+Samples of data sets used for illustrations.
+
+\begin{itemize}
+\item \texttt{pendat}: matrix \texttt{2000 x 16} of real row-elements. \\ Subsample from a data set obtained at \texttt{http://archive.ics.uci.edu/ml/datasets/} \\ \texttt{Pen-Based+Recognition+of+Handwritten+Digits}. See \citep{alimoglu96}.
+\item \texttt{penlab}: vector of numeric labels associated to \texttt{pendat}.
+\item \texttt{handdat}: matrix \texttt{2000 x 717} of real row-elements. \\ Subsample from the handwritten digits collections obtainable at \texttt{http://yann.lecun.com/exdb/mnist/}. \\ See \citep{lecun98}. \\ May be loaded into R with \texttt{readDataFile}. \\ \texttt{handdat} was built using \texttt{pixmapToVector} and filtering variables with zero entropy.
+\item \texttt{handlab}: vector of numeric labels associated to \texttt{handdat}.
+\item \texttt{handdomains}: original domains of non-void pixels in the handwritten digits collection, to be used along with \texttt{reBuild}.
+\item \texttt{handvoid}: vector of void pixel indices.
+\item \texttt{handnonvoid}: vector of non-void pixel indices.
+\item \texttt{irisdata}: matrix \texttt{150 x 4} of row-elements, extracted from \texttt{iris} standard \texttt{data.frame} (4 first variables). See \citep{fisher36}.
+\item \texttt{irislabels}: vector of numeric labels associated to \texttt{irisdata}.
+\item \texttt{gmmpen}: \texttt{list} of 20 GMM objects, estimated on subsets of the original 10992-elements \texttt{pendat} data set.
+\item \texttt{pcapen}: \texttt{list} of 20 MPPCA posterior objects, estimated on subsets of the original 10992-elements \texttt{pendat} data set.
+\item \texttt{vbpen}: \texttt{list} of 20 variational posterior GMM objects, estimated on subsets of the original 10992-elements \texttt{pendat} data set.
+\item \texttt{imgmods}: \texttt{list} of 1243 3D GMM, one for each image in the 10 first categories of the Caltech-256 image collection. Built using \texttt{RGBtoLab} and \texttt{varbayes}. See \citep{griffin07} for information about this image collection.
+\item \texttt{imglabels}: vector of numeric labels, indicating the sub-directory in the Caltech-256 collection associated to respective elements in \texttt{imgmods}.
+\item \texttt{imgnames}: absolute file paths of respective elements in \texttt{imgmods}.
+\end{itemize}
+
+NB: Let us recall that \texttt{RGBtoLab} operates on .ppm files. Furthermore, in order to save space, images associated to names in \texttt{imgnames} were not provided in this bundle.
+
+
+\section{socket client and server} \label{sec_socket}
+
+\texttt{gmmkmsock} includes a socket client, which sends data at each iteration to an adapted server. \texttt{sockserver} was designed to provide a simple testing environment for this protocol. The socket client was also proposed as a standalone for testing purposes in \texttt{sockclient}.\\
+
+These should be used as follows:
+
+\begin{itemize}
+\item \texttt{sockserver}: as a command line, launches the server on port 1979. Prints data on std out as soon as received on the socket.
+\item \texttt{sockclient [server\_IP]}: as a command line, connects a client to the server located a \texttt{server\_IP}, port 1979. If no IP specified, tries to connect to 127.0.0.1. Sends a static text string every 2 seconds.
+\end{itemize}
+
+NB: \texttt{socketclient} and \texttt{socketserver} may be found in the \texttt{socket} folder of the source archive. These standalones are not built as a part of the package, and will be build separately by running \texttt{make} in the \texttt{socket} folder. 
+
+
+\bibliography{old_manual}{}
+\bibliographystyle{plainnat}
+\end{document}
