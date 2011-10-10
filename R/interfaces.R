@@ -109,6 +109,7 @@ sort_index <- function(vec, order=0) {
 
 Rdct <- function(vect) {
 	.Call("Rdct", vect, PACKAGE="VBmix")
+	#.Call(Rdct, vect)
 }
 
 Rdct2D <- function(mat) {

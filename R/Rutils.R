@@ -1,8 +1,5 @@
 # Copyright (C) 2011 Pierrick Bruneau, see README for full notice
 
-.First.lib <- function(libname, pkgname) {
-	library.dynam("VBmix")
-}
 
 
 randomGmm <- function(domain=10) {
