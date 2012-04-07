@@ -51,14 +51,14 @@ static void interrupt(int val) {
 }
 
 
-static void init_connection(SEXP host) {
+static int init_connection(SEXP host) {
    sock = socket(AF_INET, SOCK_STREAM, 0);
    SOCKADDR_IN sin = { 0 };
    struct hostent *hostinfo;
 
    if(sock == INVALID_SOCKET) {
       Rprintf("socket()\n");
-      exit(errno);
+      return(errno);
    }
 
 	const char *used_address = CHAR(STRING_ELT(host, 0));
@@ -66,7 +66,7 @@ static void init_connection(SEXP host) {
    hostinfo = gethostbyname(used_address);
    if (hostinfo == NULL) {
       Rprintf("unknown host %s\n", used_address);
-      exit(EXIT_FAILURE);
+      return(EXIT_FAILURE);
    }
 
 	Rprintf("connected to %s\n", used_address);
@@ -77,8 +77,9 @@ static void init_connection(SEXP host) {
 
    if(connect(sock,(SOCKADDR *) &sin, sizeof(SOCKADDR)) == SOCKET_ERROR) {
       Rprintf("connect()\n");
-      exit(errno);
+      return(errno);
    }
+   return(0);
 }
 
 
@@ -116,7 +117,9 @@ SEXP gmmkmsock(SEXP models, SEXP names, SEXP ngroups, SEXP rho, SEXP host) {
 
 	// init connection to server
 	// associate specific host
-	init_connection(host);
+	if (init_connection(host)) {
+		return(R_NilValue);
+	}
    	char buffer[BUF_SIZE];
    	int nprint;
    	char *ptr;

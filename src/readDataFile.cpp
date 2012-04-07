@@ -18,15 +18,17 @@ SEXP readLabelFile(SEXP name)
 	QFile file(path);
 	file.open(QIODevice::ReadOnly);
 	
-	std::cout << "reading file " << path << "...\n";
+	//std::cout << "reading file " << path << "...\n";
+	Rprintf("reading file %s...\n", path);
 	QDataStream in(&file);
 	
 	qint32 dummy, size;
 	in >> dummy;
 	in >> size;
 	
-	std::cout << "file has " << size << " labels\n";
-	
+	//std::cout << "file has " << size << " labels\n";
+	Rprintf("file has %d labels\n", (int)size);	
+
 	quint8 elem;
 	int display;
 	SEXP res;
@@ -58,7 +60,8 @@ SEXP readPixmapFile(SEXP name)
 	QFile file(path);
 	file.open(QIODevice::ReadOnly);
 	
-	std::cout << "reading file " << path << "...\n";
+	//std::cout << "reading file " << path << "...\n";
+	Rprintf("reading file %s...\n", path);
 	QDataStream in(&file);
 
 	// get size info
@@ -68,8 +71,9 @@ SEXP readPixmapFile(SEXP name)
 	inim=nim;
 	inrow=nrow;
 	incol=ncol;
-	std::cout << "file contains " << nim << " images format " << nrow << "x" << ncol << "\n";
-	
+	//std::cout << "file contains " << nim << " images format " << nrow << "x" << ncol << "\n";
+	Rprintf("file contains %d images format %dx%d\n", (int)nim, (int)nrow, (int)ncol);
+
 	// images shall be loaded in a list of matrices, returned raw. conversion to pixmap done externally.
 	// first create appropriate R data structure
 	SEXP pack, curmat;

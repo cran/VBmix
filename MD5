@@ -1,5 +1,5 @@
 eb723b61539feef013de476e68b5c50a *COPYING
-cc99b9c85b596b137d2deefc66c53b5c *DESCRIPTION
+7d450f4655ddb1d00142950288f27aa5 *DESCRIPTION
 b33231f91c5995891350c70fb81d45eb *NAMESPACE
 36325e2ed7574e86236ba3c8f0f590f3 *R/RGBtoLab.R
 761df8049a7ae543c07a96e65ff009c4 *R/Rutils.R
@@ -12,12 +12,8 @@ afb638fe4611c2ce83ae30f5318b7161 *R/interfaces.R
 5ec2d1dae1f40bfd8300bd07190d4d27 *configure
 7444a8c50abb2dc41a68d034f76daebc *configure.ac
 bb8c1972ee5f14b8c3c55d0dac674591 *configure.win
-b77d142812fda8d853d60dc5203c1f74 *data/VBmix.RData
-f7e56e7a79119dd1952a7d6484f5c8ad *inst/LICENCE
-54ec6f89c4c563907bae615506b69200 *inst/doc/old_manual.bib
-ed27d65ad9983f3fec735e11e0dadcd4 *inst/doc/old_manual.pdf
-bff05c458aaca4a4fed56526346f0254 *inst/doc/old_manual.tex
-bff05c458aaca4a4fed56526346f0254 *inst/doc/old_manual.tex~
+651276c9e9410d3c2b75ddda9c1666aa *data/VBmix.RData
+c8ef650fd6a18918d3b11cffdfdc7066 *data/datalist
 f7331bba6704eb55819dbc4eb2b5b4a0 *man/RGBtoLab.Rd
 5085e2dda2d0bb1179beb3c96c251dc5 *man/Rdct.Rd
 7727810e015c52b9537e2a60778018a7 *man/Rdct2D.Rd
@@ -126,7 +122,7 @@ e3df5466d9bb8d5fc26dca727f3d86c1 *man/vbpen.Rd
 d95e9ffbda7628cb5930321fd20bf48c *src/couple.c
 4422e7ba5c0cdb2f670a2d70b7d9a84e *src/dirichlet.c
 a6655fd0a6f3a85733c733de856e402a *src/getLabels.c
-4235d67b80939e56fce74f39d84ccd49 *src/gmmkmsock.cpp
+cee804adc32f69ce36541c566f38b2d5 *src/gmmkmsock.cpp
 23b62944f6c7ab8486cc36001414ef76 *src/knn.c
 7547810878042b2781c0b18f841c633f *src/mmppca.c
 66178ebd02815dfbdfb49541b43ad4c9 *src/mmppca.h
@@ -134,12 +130,12 @@ a977d4d90ef23464ae40fe1f06e80c05 *src/mppca.cpp
 859ca674fdb36a05710688237b92de75 *src/mppca.h
 057cb4b6e3e276e3a645111021537c7c *src/parsers.c
 681a30bb9e6f2edadf7bca66750502f6 *src/parsers.h
-47a8312ca9f062fdb60ceaa1919ccf31 *src/readDataFile.cpp
-6961fc4d070f0419a18c03eebcd23127 *src/utils.c
+e0c709cd2138fed698491486b1dfb2c1 *src/readDataFile.cpp
+7a7924629f8cb50756f3d45536397880 *src/utils.c
 886d0975d9fb859b8ded7079673e0627 *src/utils.h
 fffc7dde9708372f5a1cd883394677d0 *src/varbayes.c
 f728f0d169723ba134b09bf1649afa75 *src/varbayes.h
 be7390fe7cd787483a1de6067dd4d06a *src/vbcomp.c
-6000e89b2f491012bc6eea44c0e17faf *src/vbcomp.h
+beb25f3407952d1aa994418f02d2db0f *src/vbcomp.h
 e489bbf64f703569fea4c43ac14bcc8f *src/vbconstr.c
-8cd27f7fa40f2b2066ff34165e37989f *src/vbconstr.h
+f47cbb484971b171f167df8d1f7b13e9 *src/vbconstr.h

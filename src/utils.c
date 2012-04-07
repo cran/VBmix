@@ -1028,8 +1028,8 @@ void setDoubleItem(list *lst, int index, double value) {
 void printList(list *lst) {
 	item *ptr = lst->first;
 	while(ptr != NULL) {
-		//Rprintf("%d %f\n", ptr->intVal, ptr->doubleVal);
-		printf("%d %f\n", ptr->intVal, ptr->doubleVal);
+		Rprintf("%d %f\n", ptr->intVal, ptr->doubleVal);
+		//printf("%d %f\n", ptr->intVal, ptr->doubleVal);
 		ptr = ptr->next;
 	}
 }
