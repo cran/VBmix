@@ -145,7 +145,7 @@ circlegen <- function(npts=200, radius=10, noise=1) {
 	return(dat)
 }
 
-norm <- function(vec) {
+l2norm <- function(vec) {
 	val <- 0
 	for(i in 1:length(vec)) {
 		val <- val + vec[i]^2

@@ -1,14 +1,14 @@
-\name{norm}
-\alias{norm}
+\name{l2norm}
+\alias{l2norm}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-norm
+l2norm
 }
 \description{
 computes Euclidian norm of vec.
 }
 \usage{
-norm(vec)
+l2norm(vec)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,6 +23,6 @@ norm value.
 Pierrick Bruneau
 }
 \examples{
-temp <- norm(gmmpen[[2]]$mean[[1]])
+temp <- l2norm(gmmpen[[2]]$mean[[1]])
 }
 

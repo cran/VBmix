@@ -1,8 +1,8 @@
 eb723b61539feef013de476e68b5c50a *COPYING
-7d450f4655ddb1d00142950288f27aa5 *DESCRIPTION
+d5aea42de8d3f319922d3057e24a88c7 *DESCRIPTION
 b33231f91c5995891350c70fb81d45eb *NAMESPACE
 36325e2ed7574e86236ba3c8f0f590f3 *R/RGBtoLab.R
-761df8049a7ae543c07a96e65ff009c4 *R/Rutils.R
+e22a7ed89190c8fce98fe2b68bdf8cfb *R/Rutils.R
 94c15756153c9707aa8b0981bb7b23bb *R/classicEM.R
 f301bb9e463498d5cbc3c4df8135d6ff *R/displayGraph.R
 7d54b00db60b7315c8804cd83fa7107f *R/displayScatter.R
@@ -12,7 +12,7 @@ afb638fe4611c2ce83ae30f5318b7161 *R/interfaces.R
 5ec2d1dae1f40bfd8300bd07190d4d27 *configure
 7444a8c50abb2dc41a68d034f76daebc *configure.ac
 bb8c1972ee5f14b8c3c55d0dac674591 *configure.win
-651276c9e9410d3c2b75ddda9c1666aa *data/VBmix.RData
+6c68acd3b6c7ec3c6225915367c49580 *data/VBmix.RData
 c8ef650fd6a18918d3b11cffdfdc7066 *data/datalist
 f7331bba6704eb55819dbc4eb2b5b4a0 *man/RGBtoLab.Rd
 5085e2dda2d0bb1179beb3c96c251dc5 *man/Rdct.Rd
@@ -75,6 +75,7 @@ f18a37bbd767e7e23caff47a6142b7c6 *man/irisdata.Rd
 8fa702786b38f253c2dddb83c9fcdb8e *man/jsut.Rd
 e8c22e2758cba3cdb77ee126cdf4ba27 *man/klmc.Rd
 4d1fd722bb9e9f987bb00a2a37d45358 *man/klut.Rd
+53d4c83b239209f6b3b9e561e714c8fc *man/l2norm.Rd
 b70f0951fe60a7e22c0b7ea53d7ddb36 *man/mergeClassif.Rd
 c64e286836ed8a4d52b5bda53e197520 *man/mixKnn.Rd
 99bf82b195258e2ec4979706a6efd726 *man/mmppca.Rd
@@ -87,7 +88,6 @@ b13033fe61cabee51b0e8a9c23a44aa1 *man/mySmoothScatter.Rd
 044283946543923af32c0513300cab78 *man/mymvn2plot.Rd
 0256fb56d121ba1506bb370b924daab3 *man/newGmm.Rd
 f304676ac38c64cfefbf1cb283864288 *man/newMppca.Rd
-0a8e48f8bb9bccd178138012f78b2b7b *man/norm.Rd
 44bec705491bf7984012f124a4750c5a *man/normMppca.Rd
 ae731a84b714f546c9b8d8c1af99db60 *man/normalizeVariable.Rd
 64e3976d22c9e47774bb2d1a90d34e7a *man/pca.Rd
