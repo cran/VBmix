@@ -42,7 +42,7 @@ newMppca mppca subMppca
 }
 \examples{
 temp <- newMppca()
-for(i in 1:10) temp <- appendToMppca(temp, pcapen[[i]])
-temp2 <- mmppca(temp, 100, maxit=30)
+for(i in 1:3) temp <- appendToMppca(temp, pcapen[[i]])
+temp2 <- mmppca(temp, 50, maxit=30)
 }
 

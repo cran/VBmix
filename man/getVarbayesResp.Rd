@@ -32,6 +32,7 @@ Pierrick Bruneau
 getResp ZtoLabels
 }
 \examples{
-temp <- getVarbayesResp(pendat, vbpen[[2]])
+# get resp for only a subsample, as this operation is rather long.
+temp <- getVarbayesResp(pendat[1:10,], vbpen[[2]])
 }
 

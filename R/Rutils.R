@@ -22,7 +22,7 @@ randomGmm <- function(domain=10) {
 	return(mod)
 }
 
-plotGmm <- function(mod) {
+plotGmm <- function(mod, steps=200) {
 	# get domain from means and covariances
 	K <- length(mod$w)
 	if(length(mod$mean[[1]]) != 2) stop("only 2D GMMs can be used")
@@ -39,14 +39,14 @@ plotGmm <- function(mod) {
 		}
 	}
 	
-	stepx <- (up_right[1] - low_left[1]) / 200
-	stepy <- (up_right[2] - low_left[2]) / 200
+	stepx <- (up_right[1] - low_left[1]) / steps
+	stepy <- (up_right[2] - low_left[2]) / steps
 	
 	
-	pdf <- matrix(nrow=201, ncol=201)
+	pdf <- matrix(nrow=steps+1, ncol=steps+1)
 	
-	for(i in 0:201) {
-		for(j in 0:201) {
+	for(i in 0:(steps+1)) {
+		for(j in 0:(steps+1)) {
 			pdf[i,j] <- gmmdensity(mod, t(as.matrix(c(low_left[1] + i * stepx, low_left[2] + j * stepy))))
 		}
 	}

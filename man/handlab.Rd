@@ -9,7 +9,7 @@ vector of numeric labels associated to handdat.
 }
 \format{
   The format is:
- int [1:2000] 0 3 2 0 8 1 3 7 3 7 ...
+ int [1:300] 0 3 2 0 8 1 3 7 3 7 ...
 }
 \source{
 http://yann.lecun.com/exdb/mnist/

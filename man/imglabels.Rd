@@ -9,7 +9,7 @@ vector of numeric labels, indicating the sub-directory in the Caltech-256 collec
 }
 \format{
   The format is:
- num [1:1243] 1 1 1 1 1 1 1 1 1 1 ...
+ num [1:200] 1 1 1 1 1 1 1 1 1 1 ...
 }
 \examples{
 imglabels[1:10]

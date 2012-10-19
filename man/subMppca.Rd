@@ -41,7 +41,8 @@ Pierrick Bruneau
 mppca newMppca
 }
 \examples{
-temp <- mppca(pendat, 15, qmax=8, maxit=50)
+# use a subsample of pendat, for runtime (packaging) needs.
+temp <- mppca(pendat[sample(1:2000,150),], 15, qmax=8, maxit=20)
 temp2 <- subMppca(temp, prune=TRUE, quick=TRUE)
 }
 

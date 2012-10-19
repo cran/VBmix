@@ -5,11 +5,11 @@
 handdat
 }
 \description{
-matrix 2000 x 717 of real row-elements. See reference. May be loaded into R with readDataFile. handdat was built using pixmapToVector and filtering variables with zero entropy.
+matrix 300 x 717 of real row-elements. See reference. May be loaded into R with readDataFile. handdat was built using pixmapToVector and filtering variables with zero entropy.
 }
 \format{
   The format is:
- num [1:2000, 1:717] 10 10 10 10 10 10 10 10 10 10 ...
+ num [1:300, 1:717] 10 10 10 10 10 10 10 10 10 10 ...
 }
 \source{
 http://yann.lecun.com/exdb/mnist/

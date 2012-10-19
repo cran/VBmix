@@ -41,6 +41,8 @@ Pierrick Bruneau
 newMppca mppcaToGmm subMppca
 }
 \examples{
-temp <- mppca(pendat, 100, maxit=30, qmax=8)
+# for packaging needs, a low amount of initial components (ie 10) was used.
+# A larger amount may be used for better results.
+temp <- mppca(pendat, 10, maxit=20, qmax=8)
 }
 

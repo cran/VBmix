@@ -8,12 +8,15 @@ plotGmm
 3D density plot of a 2D GMM.
 }
 \usage{
-plotGmm(mod)
+plotGmm(mod, steps=200)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{mod}{
 GMM object to plot
+}
+  \item{steps}{
+  specifies the hoizontal and vertical amount of vertices used to build the wireframe plot.
 }
 }
 \value{
@@ -26,6 +29,7 @@ Pierrick Bruneau
 displayScatter
 }
 \examples{
-plotGmm(randomGmm())
+# a larger number of steps (eg 200) should be used for a visually effective 3D plot.
+plotGmm(randomGmm(), steps=20)
 }
 

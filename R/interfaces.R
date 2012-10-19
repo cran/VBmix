@@ -38,14 +38,6 @@ getCouple <- function(vec1, vec2) {
 	.Call("couple", vec1, vec2, PACKAGE="VBmix")
 }
 
-getTimestamp <- function() {
-	.Call("getTimestamp", PACKAGE="VBmix")
-}
-
-getElapsed <- function(stamp) {
-	.Call("getElapsed", stamp, PACKAGE="VBmix")
-}
-
 readLabelFile <- function(name) {
 	.Call("readLabelFile", name, PACKAGE="VBmix")
 }

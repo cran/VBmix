@@ -38,6 +38,7 @@ Pierrick Bruneau
 mppca mmppca
 }
 \examples{
-temp <- incremMerge(pcapen[[1]], pcapen[[2]], quick=T)
+# commented for packaging needs (requires approx. 5s)
+#temp <- incremMerge(pcapen[[1]], pcapen[[2]], quick=T)
 }
 

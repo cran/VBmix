@@ -5,11 +5,11 @@
 pcapen
 }
 \description{
-list of 20 MPPCA posterior objects, estimated on subsets of the original 10992-elements pendat data set.
+list of 10 MPPCA posterior objects, estimated on subsets of the original 10992-elements pendat data set.
 }
 \format{
   The format is:
-List of 20 posterior MPPCA objects
+List of 10 posterior MPPCA objects
 }
 \examples{
 temp <- mppcaToGmm(pcapen[[1]])

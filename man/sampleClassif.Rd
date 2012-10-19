@@ -35,7 +35,7 @@ Pierrick Bruneau
 mixKnn
 }
 \examples{
-temp1 <- sample(1:1243, 150)
+temp1 <- sample(1:200, 150)
 temp2 <- list()
 for(i in temp1) temp2 <- appendToList(temp2, imgmods[[i]])
 temp3 <- imglabels[temp1]

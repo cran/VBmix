@@ -42,7 +42,7 @@ Pierrick Bruneau
 gmmkmsock includes a socket client that sends formatted data to a server. Detailed information about this protocol may be found in the source package (inst/doc/old_manual.pdf). Simple standalone client and server are also provided (socket/socketclient.cpp and socketserver.cpp). These can be build by running make in the source folder.
 }
 \examples{
-temp1 <- sample(1:1243, 150)
+temp1 <- sample(1:200, 150)
 temp2 <- list()
 for(i in 1:length(temp1)) temp2 <- appendToList(temp2, imgmods[[temp1[i]]])
 temp3 <- imgnames[temp1]
