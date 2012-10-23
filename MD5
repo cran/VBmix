@@ -1,5 +1,5 @@
 eb723b61539feef013de476e68b5c50a *COPYING
-56de7cf57e6dc6d9fbb16135889d03fd *DESCRIPTION
+27c88154cc79794ccf358b3492dbb14e *DESCRIPTION
 b33231f91c5995891350c70fb81d45eb *NAMESPACE
 36325e2ed7574e86236ba3c8f0f590f3 *R/RGBtoLab.R
 fe2c74bb00b35f1bd26d5fba6a008057 *R/Rutils.R
@@ -8,11 +8,10 @@ f301bb9e463498d5cbc3c4df8135d6ff *R/displayGraph.R
 7d54b00db60b7315c8804cd83fa7107f *R/displayScatter.R
 9e7777a7baf36c26a57a0a0075dda6ef *R/interfaces.R
 3d8666394a0d1b7a4aa26177ba70067b *README
-131a236039d88977475269c6ee6c6e2c *cleanup
-5ec2d1dae1f40bfd8300bd07190d4d27 *configure
-7444a8c50abb2dc41a68d034f76daebc *configure.ac
+70fd0b98d8270c374f1c0a9b90a9c55c *configure
+c4b5c6cf5393e23cd04ab1ace79a022e *configure.ac
 bb8c1972ee5f14b8c3c55d0dac674591 *configure.win
-b67be94d0d55833672f72e746bafa666 *data/VBmix.RData
+7d1e6527d02e0bb0f5843a91b0386acc *data/VBmix.RData
 c8ef650fd6a18918d3b11cffdfdc7066 *data/datalist
 f7331bba6704eb55819dbc4eb2b5b4a0 *man/RGBtoLab.Rd
 5085e2dda2d0bb1179beb3c96c251dc5 *man/Rdct.Rd
@@ -107,7 +106,7 @@ d79d88cb4a4ccb30f56fb233b871666e *man/spiralgen.Rd
 a19bf0be13c23a7d1a1e881c2f76dcec *man/subGmm.Rd
 26b34035d15a3659610426d0e26163b5 *man/subMppca.Rd
 922e321002d7bb5de3462a8576e93f21 *man/subVarbayes.Rd
-f4d0f340e382e05117fd8da727401975 *man/varbayes.Rd
+960c396de91f2067b6c093f02ce6c483 *man/varbayes.Rd
 13ca148f0bb31d43b579950ce2df00c9 *man/vbcomp.Rd
 d04db3731b580ddf82b548829a45ccf7 *man/vbconstr.Rd
 b37d24d6c6f48f8b3e422f06af0df207 *man/vbpen.Rd
@@ -131,7 +130,7 @@ a977d4d90ef23464ae40fe1f06e80c05 *src/mppca.cpp
 e0c709cd2138fed698491486b1dfb2c1 *src/readDataFile.cpp
 7a7924629f8cb50756f3d45536397880 *src/utils.c
 2a31aca239df69668cce3d29ce1f9503 *src/utils.h
-fffc7dde9708372f5a1cd883394677d0 *src/varbayes.c
+e7b21c0076b322cd15dc11798104d7dc *src/varbayes.c
 f728f0d169723ba134b09bf1649afa75 *src/varbayes.h
 be7390fe7cd787483a1de6067dd4d06a *src/vbcomp.c
 beb25f3407952d1aa994418f02d2db0f *src/vbcomp.h

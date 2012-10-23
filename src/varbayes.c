@@ -889,7 +889,8 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 	SEXP mecur, wicur, dims1, dims2;
 	SEXP Rnks, Ragitations;
 	
-	PROTECT(ret = allocVector(VECSXP, 4));
+	// PBR : increase ret : also return latest bound value.
+	PROTECT(ret = allocVector(VECSXP, 5));
 	PROTECT(mod = allocVector(VECSXP, 6));
 	PROTECT(al = allocVector(REALSXP, k));
 	PROTECT(be = allocVector(REALSXP, k));
@@ -956,12 +957,13 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 
 	
 	
-	PROTECT(dims1 = allocVector(VECSXP, 4));
+	PROTECT(dims1 = allocVector(VECSXP, 5));
 	PROTECT(dims2 = allocVector(VECSXP, 6));
 	SET_VECTOR_ELT(dims1, 0, mkChar("model"));
 	SET_VECTOR_ELT(dims1, 1, mkChar("data"));
 	SET_VECTOR_ELT(dims1, 2, mkChar("nk"));
 	SET_VECTOR_ELT(dims1, 3, mkChar("agitation"));
+	SET_VECTOR_ELT(dims1, 4, mkChar("bound"));
 	SET_VECTOR_ELT(dims2, 0, mkChar("alpha"));
 	SET_VECTOR_ELT(dims2, 1, mkChar("beta"));
 	SET_VECTOR_ELT(dims2, 2, mkChar("nu"));
@@ -971,10 +973,16 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 	
 	setAttrib(mod, R_NamesSymbol, dims2);
 	
+	SEXP outbound;
+	PROTECT(outbound = allocVector(REALSXP, 1));
+	tab = REAL(outbound);
+	tab[0] = bound;
+	
 	SET_VECTOR_ELT(ret, 0, mod);
 	SET_VECTOR_ELT(ret, 1, data);
 	SET_VECTOR_ELT(ret, 2, Rnks);
 	SET_VECTOR_ELT(ret, 3, Ragitations);
+	SET_VECTOR_ELT(ret, 4, outbound);
 	
 	setAttrib(ret, R_NamesSymbol, dims1);
 	
@@ -1048,7 +1056,7 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 	Free(agitations);
 	
 
-	UNPROTECT(15);
+	UNPROTECT(16);
 	return(ret);
 
 }

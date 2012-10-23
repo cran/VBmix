@@ -26,7 +26,16 @@ if NULL, the stopping criterion is related to thres. If not NULL, maxit iteratio
 }
 }
 \value{
-estimated posterior with ncomp components. Structured in a list object as follows:
+A list object, with the following items:
+
+\item{model}{posterior variational distribution.}
+\item{data}{a copy of the data parameter.}
+\item{nk}{counts, for each iteration, of the population modeled by each Gaussian component.}
+\item{agitation}{agitation measures (see Beal 2003 for explanation) for each iteration and Gaussian component.}
+\item{bound}{latest monitored bound value (convergence criterion maximized throughout the process).}
+
+The model item is structured in a list as follows:
+
 \item{alpha}{hyperparameters influencing the active components in the posterior.}
 \item{beta}{hyperparameters regarding shaping of the Normal-Wishart posteriors.}
 \item{nu}{hyperparameters regarding shaping of the Normal-Wishart posteriors.}
@@ -34,7 +43,9 @@ estimated posterior with ncomp components. Structured in a list object as follow
 \item{wish}{hyperparameters regarding shaping of the Normal-Wishart posteriors.}
 }
 \references{
-Bishop, C. M. (2006) _Pattern Recognition and Machine Learning_, Chapter 10, Springer.
+Bishop, C. M. (2006) \emph{Pattern Recognition and Machine Learning}, Chapter 10, Springer.
+
+Beal, M. J. (2003) \emph{Variational Algorithms for approximate inference}, PhD thesis, University of London.
 }
 \author{
 Pierrick Bruneau

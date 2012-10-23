@@ -1,5 +1,5 @@
 ## VBmix
-AC_INIT([VBmix], [0.3], [pbruneau@gmail.com])
+AC_INIT([VBmix], [0.2.10], [pbruneau@gmail.com])
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
    echo "could not determine R_HOME"
