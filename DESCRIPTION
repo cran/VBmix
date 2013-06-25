@@ -1,5 +1,5 @@
 Package: VBmix
-Version: 0.2.12
+Version: 0.2.13
 Date: 2013-06-25
 Author: Pierrick Bruneau
 Maintainer: Pierrick Bruneau <pbruneau@gmail.com>
@@ -17,5 +17,5 @@ License: GPL-2 | GPL-3
 NeedsCompilation: yes
 OS_type: unix
 Repository: CRAN
-Packaged: 2013-06-25 13:05:19 UTC; bruneau
-Date/Publication: 2013-06-25 15:08:19
+Packaged: 2013-06-25 13:52:18 UTC; bruneau
+Date/Publication: 2013-06-25 16:13:11

@@ -1,5 +1,5 @@
 eb723b61539feef013de476e68b5c50a *COPYING
-df09ce255b3fc51fdd749fb83ccc1b2b *DESCRIPTION
+c92818890d8a655c87a26c0db319fcb1 *DESCRIPTION
 b33231f91c5995891350c70fb81d45eb *NAMESPACE
 36325e2ed7574e86236ba3c8f0f590f3 *R/RGBtoLab.R
 fe2c74bb00b35f1bd26d5fba6a008057 *R/Rutils.R
@@ -8,7 +8,7 @@ f301bb9e463498d5cbc3c4df8135d6ff *R/displayGraph.R
 7d54b00db60b7315c8804cd83fa7107f *R/displayScatter.R
 9e7777a7baf36c26a57a0a0075dda6ef *R/interfaces.R
 3d8666394a0d1b7a4aa26177ba70067b *README
-d697a7e447fb0162d8b4178eb637d543 *configure
+813cb764dd33edf197c62a1405a62952 *configure
 93426bd8fe8fbf5502ed5b9fc2e1cd3b *configure.ac
 bb8c1972ee5f14b8c3c55d0dac674591 *configure.win
 7d1e6527d02e0bb0f5843a91b0386acc *data/VBmix.RData
