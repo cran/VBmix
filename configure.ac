@@ -13,8 +13,6 @@ CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
 CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
 
 
-
-
 AC_CHECK_LIB(m, cos, , AC_MSG_ERROR("math library not found"))
 AC_CHECK_LIB(gslcblas, cblas_dgemm, , 
 	AC_MSG_ERROR("gslcblas library not found"))

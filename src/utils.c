@@ -259,7 +259,7 @@ SEXP gmmgen(SEXP mod, SEXP nitem) {
 	
 	int i,j,l;
 	int k,d=0;
-	
+	int cur;
 	// w
 	curcomp = coerceVector(getListElement(mod, "w"), REALSXP);
 	k=length(curcomp);
@@ -330,11 +330,13 @@ SEXP gmmgen(SEXP mod, SEXP nitem) {
 	
 	list **root = Calloc(k, list *);
 	for(i=0; i<k; i++) {
-		root[i] = createList();
+		//root[i] = createList();
+		root[i] = Calloc(1, list);
 	}
 	
 	for(i=0; i<n; i++) {
-		addItem(root[INTEGER(multivec)[i]], i, 0.0);
+		cur=INTEGER(multivec)[i];
+		addItem(root[cur], i, 0.0);
 	}
 	
 	//for(i=0; i<k; i++) {
@@ -620,6 +622,9 @@ SEXP klut(SEXP mod1, SEXP mod2) {
 	// computes klut(mod1 || mod2)
 	// for 2 models structured (w, mean, cov)
 	// assumes coherent dimensionalities
+	PROTECT(mod1 = coerceVector(mod1, VECSXP));
+	PROTECT(mod2 = coerceVector(mod2, VECSXP));
+
 	int k1 = length(getListElement(mod1, "w"));
 	int k2 = length(getListElement(mod2, "w"));
 	int d = length(VECTOR_ELT(getListElement(mod1, "mean"), 0));
@@ -640,11 +645,13 @@ SEXP klut(SEXP mod1, SEXP mod2) {
 	gsl_vector_view view1;
 	gsl_vector_view view2;
 	SEXP cursamp;
+	PROTECT_INDEX ipx[2];
 	PROTECT(cursamp = allocMatrix(REALSXP, 2*d+1, d));
 	SEXP densities1;
-	PROTECT(densities1 = allocVector(REALSXP, 2*d+1));
+	PROTECT_WITH_INDEX(densities1 = allocVector(REALSXP, 2*d+1), &ipx[0]);
 	SEXP densities2;
-	PROTECT(densities2 = allocVector(REALSXP, 2*d+1));
+	PROTECT_WITH_INDEX(densities2 = allocVector(REALSXP, 2*d+1), &ipx[1]);
+	
 		
 	// perform eigen value decompositions, and fill sample matrix with its results
 	for(i=0; i<k1; i++) {
@@ -665,14 +672,13 @@ SEXP klut(SEXP mod1, SEXP mod2) {
 		view1 = gsl_matrix_row(samp[i], 2*d);
 		gsl_vector_memcpy(&view1.vector, mean);
 	}
-	
-			
+		
 	// calculate KL approximation
 	double klapprox = 0.0;
 	for(i=0; i<k1; i++) {
 		matrixToSXP(&cursamp, samp[i]);
-		densities1 = gmmdensity(mod1, cursamp);
-		densities2 = gmmdensity(mod2, cursamp);
+		REPROTECT(densities1 = gmmdensity(mod1, cursamp), ipx[0]);
+		REPROTECT(densities2 = gmmdensity(mod2, cursamp), ipx[1]);
 		
 		
 		for(j=0; j<(2*d+1); j++) {
@@ -690,7 +696,6 @@ SEXP klut(SEXP mod1, SEXP mod2) {
 			}
 			klapprox += (1.0 / (2.0 * d + 1.0)) * (REAL(getListElement(mod1, "w"))[i]) * gsl_sf_log(num/den);
 		}
-		
 	}
 	
 	SEXP result;
@@ -712,7 +717,7 @@ SEXP klut(SEXP mod1, SEXP mod2) {
 	gsl_matrix_free(vecs);
 	gsl_vector_free(vals);
 	gsl_vector_free(mean);
-	UNPROTECT(4);
+	UNPROTECT(6);
 	return(result);
 		
 }
@@ -731,7 +736,8 @@ SEXP jsut(SEXP mod1, SEXP mod2) {
 	// build global w vector
 	gsl_vector *globw = gsl_vector_alloc(k1+k2);
 	read = REAL(coerceVector(getListElement(mod1, "w"), REALSXP));
-	
+
+
 	for(i=0; i<k1; i++) {
 		gsl_vector_set(globw, i, read[i]);
 	}
@@ -769,6 +775,7 @@ SEXP jsut(SEXP mod1, SEXP mod2) {
 	SET_VECTOR_ELT(avmod, 1, avmean);
 	SET_VECTOR_ELT(avmod, 2, avcov);
 	
+
 	SEXP dims;
 	PROTECT(dims = allocVector(VECSXP, 3));
 	SET_VECTOR_ELT(dims, 0, mkChar("w"));
@@ -777,15 +784,21 @@ SEXP jsut(SEXP mod1, SEXP mod2) {
 	
 	setAttrib(avmod, R_NamesSymbol, dims);
 	
-	double res = 0.5 * REAL(klut(mod1, avmod))[0] + 0.5 * REAL(klut(mod2, avmod))[0];
-	
+	//double res = 0.5 * REAL(klut(mod1, avmod))[0] + 0.5 * REAL(klut(mod2, avmod))[0];
+	// protect klut results	
+	SEXP klmod1, klmod2;
+	PROTECT(klmod1 = klut(mod1, avmod));
+	PROTECT(klmod2 = klut(mod2, avmod));
+	double res = 0.5 * REAL(klmod1)[0] + 0.5 * REAL(klmod2)[0];
+
+
 	SEXP sxpRes;
 	PROTECT(sxpRes = allocVector(REALSXP, 1));
 	REAL(sxpRes)[0] = res;
 	
 	gsl_vector_free(globw);
 	
-	UNPROTECT(8);
+	UNPROTECT(10);
 	return(sxpRes);
 }
 
@@ -794,9 +807,9 @@ SEXP jsut(SEXP mod1, SEXP mod2) {
 	
 		
 
-list *createList() {
-	list *theList = Calloc(1, list);
-}
+//list *createList() {
+//	list *theList = Calloc(1, list);
+//}
 
 void addItem(list *theList, int intVal, double doubleVal) {
 	if(theList->first == 0) {
@@ -1078,8 +1091,9 @@ SEXP extractSimpleModel(SEXP model, SEXP labels) {
 	d = INTEGER(getAttrib(VECTOR_ELT(getListElement(getListElement(model, "model"), "wish"), 0), R_DimSymbol))[0];
 	cumul = SXPvectorSum(alpha);
 	
-	list *selection = createList();
-	
+	//list *selection = createList();
+	list *selection = Calloc(1, list);	
+
 	for(i=0; i<k; i++) {
 		// extract component only if more than 2 points supported
 		if((REAL(alpha)[i] - 0.01) > 2.0) {

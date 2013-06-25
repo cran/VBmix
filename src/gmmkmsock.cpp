@@ -165,7 +165,8 @@ SEXP gmmkmsock(SEXP models, SEXP names, SEXP ngroups, SEXP rho, SEXP host) {
 	}
 	
 	// init groups list
-	list* groups = createList();
+	//list* groups = createList();
+	list* groups = Calloc(1, list);	
 	for(i=0; i<k; i++) {
 		addItem(groups, i, 0.0);
 	}
@@ -212,7 +213,8 @@ SEXP gmmkmsock(SEXP models, SEXP names, SEXP ngroups, SEXP rho, SEXP host) {
 		cnt++;
 				
 		// get changes for output
-		list *changes = createList();
+		//list *changes = createList();
+		list *changes = Calloc(1, list);
 		Rprintf("entering div. computing :");
 		SEXP curJS;
 		PROTECT_WITH_INDEX(curJS=allocVector(REALSXP, 1), &ipx[0]);
@@ -286,7 +288,8 @@ SEXP gmmkmsock(SEXP models, SEXP names, SEXP ngroups, SEXP rho, SEXP host) {
 			
 			for(i=0; i<size(groups); i++) {
 				// new list to memorize current set of item indexes
-				list *curset = createList();
+				//list *curset = createList();
+				list *curset = Calloc(1, list);
 				for(j=0; j<n; j++) {
 					if(INTEGER(labels)[j] == getIntItem(groups, i)) {
 						addItem(curset, j, 0.0);

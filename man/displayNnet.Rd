@@ -8,7 +8,8 @@ displayNnet
 displays the colored decision regions of a neural network model. Data symbols are also optionally displayed. Data and model should be 2D.
 }
 \usage{
-displayNnet(nnet.model, datamatrix, datalabels, subset = NULL, displayPoints = TRUE, steps = 100, alpha = 0.4, lwd = 1)
+displayNnet(nnet.model, datamatrix, datalabels, subset = NULL, 
+displayPoints = TRUE, steps = 100, alpha = 0.4, lwd = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

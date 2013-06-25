@@ -36,7 +36,8 @@ SEXP mixKnn(SEXP data, SEXP labels, SEXP n, SEXP KLparam) {
 	int len = length(labels);
 	int found;
 	cell dists[len];
-	list *kcounts = createList();
+	//list *kcounts = createList();
+	list *kcounts = Calloc(1, list);
 	item *ptr;
 	int cur;
 	

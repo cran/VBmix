@@ -8,7 +8,10 @@ displayScatter
 general plotting function for data sets (matrix of row-elements), optionally associated to labels and a GMM. Labels influence the color and symbols of plotted data points. Gaussian envelopes of the components in the GMM are drawn. NB: data set and GMM arguments cannot be both NULL.
 }
 \usage{
-displayScatter(data = NULL, model = NULL, labels = NULL, datasizes = NULL, compcolors = NULL, complabels = NULL, compstrokes = "solid", space = 1:2, xlim = NULL, ylim = NULL, main = "", xlab = "", ylab = "", smooth = FALSE, alphacol = 0.8, alphanocol = 0.5, cex.lab = 1, lwd = 1)
+displayScatter(data = NULL, model = NULL, labels = NULL, datasizes = NULL, 
+compcolors = NULL, complabels = NULL, compstrokes = "solid", space = 1:2, 
+xlim = NULL, ylim = NULL, main = "", xlab = "", ylab = "", smooth = FALSE, 
+alphacol = 0.8, alphanocol = 0.5, cex.lab = 1, lwd = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

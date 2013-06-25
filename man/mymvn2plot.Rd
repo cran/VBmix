@@ -8,7 +8,8 @@ mymvn2plot
 displays mvn envelopes. For internal usage in graphical functions.
 }
 \usage{
-mymvn2plot(w, mu, sigma, k = 15, alone = FALSE, col = NA, alphacol = 0.8, alphanocol = 0.5, lty = "solid")
+mymvn2plot(w, mu, sigma, k = 15, alone = FALSE, col = NA, 
+alphacol = 0.8, alphanocol = 0.5, lty = "solid")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -8,7 +8,8 @@ displaySVM
 displays the colored decision regions of a SVM model. Data symbols are also optionally displayed. Data and model should be 2D.
 }
 \usage{
-displaySVM(svm.model, dataframe, displayPoints = TRUE, subset = NULL, steps = 100, alpha = 0.4, lwd = 1)
+displaySVM(svm.model, dataframe, displayPoints = TRUE, 
+subset = NULL, steps = 100, alpha = 0.4, lwd = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

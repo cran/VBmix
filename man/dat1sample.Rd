@@ -44,6 +44,11 @@ Pierrick Bruneau
 dat2sample dat3sample
 }
 \examples{
+
 temp <- dat1sample(500, randomGmm(), 1, generate2Dtransform())
+
 }
+
+
+
 

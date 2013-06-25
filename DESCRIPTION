@@ -1,6 +1,6 @@
 Package: VBmix
-Version: 0.2.11
-Date: 2013-03-06
+Version: 0.2.12
+Date: 2013-06-25
 Author: Pierrick Bruneau
 Maintainer: Pierrick Bruneau <pbruneau@gmail.com>
 Title: Variational Bayesian mixture models
@@ -14,8 +14,8 @@ Imports:
 LazyLoad: yes
 LazyData: yes
 License: GPL-2 | GPL-3
-Packaged: 2013-03-11 10:16:13 UTC; bruneau
 NeedsCompilation: yes
 OS_type: unix
 Repository: CRAN
-Date/Publication: 2013-03-11 11:55:33
+Packaged: 2013-06-25 13:05:19 UTC; bruneau
+Date/Publication: 2013-06-25 15:08:19

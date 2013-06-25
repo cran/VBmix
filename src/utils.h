@@ -80,7 +80,7 @@ typedef struct {
 	item *last;
 } list;
 
-list *createList();
+//list *createList();
 void addItem(list *, int, double);
 void insertItem(list *, int, double, int);
 int size(list *);

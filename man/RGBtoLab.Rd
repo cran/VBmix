@@ -33,7 +33,8 @@ matrix of pixel row-elements.
 Pierrick Bruneau
 }
 \examples{
-# image collections are large, thus not provided. The following commented example relates to a member of this image collection.
+# image collections are large, thus not provided. 
+# The following commented example relates to a member of this image collection.
 #temp <- RGBtoLab(imgnames[[2]], filterWhite=TRUE)
 }
 

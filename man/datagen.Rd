@@ -8,7 +8,8 @@ datagen
 generates data from a random multivariate Gaussian, and adds redundant dimensions by random linear combinations with noise.
 }
 \usage{
-datagen(dreal = 2, deff = 6, npts = 200, noise = 0.1, genmean = rep(0, dreal), genspan = 6, iso = FALSE)
+datagen(dreal = 2, deff = 6, npts = 200, noise = 0.1, genmean = rep(0, dreal),
+genspan = 6, iso = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
