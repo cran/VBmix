@@ -898,8 +898,8 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 	PROTECT(me = allocVector(VECSXP, k));
 	PROTECT(wi = allocVector(VECSXP, k));
 	
-	PROTECT(Rnks = allocVector(VECSXP, count-2));
-	PROTECT(Ragitations = allocVector(VECSXP, count-2));
+	PROTECT(Rnks = allocVector(VECSXP, count-1));
+	PROTECT(Ragitations = allocVector(VECSXP, count-1));
 	
 	double *altab = REAL(al);
 	double *betab = REAL(be);
@@ -938,7 +938,7 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 		}
 	}
 
-	for(i=0; i<count-2; i++) {
+	for(i=0; i<count-1; i++) {
 		SET_VECTOR_ELT(Rnks, i, allocVector(REALSXP, k));
 		SET_VECTOR_ELT(Ragitations, i, allocVector(REALSXP, k));
 		for(j=0; j<k; j++) {
@@ -1048,7 +1048,7 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 	gsl_vector_free(tempvec);
 	gsl_vector_free(templine);
 	
-	for(i=0; i<count-2; i++) {
+	for(i=0; i<count-1; i++) {
 		Free(nks[i]);
 		Free(agitations[i]);
 	}

@@ -48,9 +48,9 @@ Pierrick Bruneau
 nnet
 }
 \examples{
-temp <- class.ind(irislabels)
+temp <- nnet::class.ind(irislabels)
 temp2 <- setDomain(irisdata[,1:2], 10)
-temp3 <- nnet(temp2, temp, size=10)
+temp3 <- nnet::nnet(temp2, temp, size=10)
 displayNnet(temp3, temp2, temp)
 }
 

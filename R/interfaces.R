@@ -48,7 +48,7 @@ readPixmapFile <- function(name) {
 	print("post processing...")
 	for(i in 1:length(dat)) {
 		dat[[i]] <- (255-dat[[i]])/255
-		dat[[i]] <- pixmapGrey(dat[[i]])
+		dat[[i]] <- pixmap::pixmapGrey(dat[[i]])
 	}
 	return(dat)
 }

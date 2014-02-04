@@ -308,8 +308,10 @@ displaySVM <- function(svm.model, dataframe, displayPoints=TRUE, subset=NULL, st
 
 	# set up grid viewport
 	pos <- par("plt")
-	pushViewport(viewport(x=unit(pos[1], "npc"), y=unit(pos[3], "npc"), width=unit(pos[2]-pos[1], "npc"), height=unit(pos[4]-pos[3], "npc"), just=c("left", "bottom")))
-	pushViewport(viewport(xscale=xlim, yscale=ylim))
+	grid::pushViewport(grid::viewport(x=grid::unit(pos[1], "npc"), y=grid::unit(pos[3], "npc"), 
+		width=grid::unit(pos[2]-pos[1], "npc"), height=grid::unit(pos[4]-pos[3], "npc"), 
+		just=c("left", "bottom")))
+	grid::pushViewport(grid::viewport(xscale=xlim, yscale=ylim))
 
 
 	# create alpha blended colors from labels
@@ -327,7 +329,9 @@ displaySVM <- function(svm.model, dataframe, displayPoints=TRUE, subset=NULL, st
 	
 	
 	# plot decision regions
-	grid.rect(x=unit(datagrid[,1], "native"), y=unit(datagrid[,2], "native"), width=unit(xstep, "native"), height=unit(ystep, "native"), gp=gpar(fill=gridcolors, lty=0, col=gridcolors))
+	grid::grid.rect(x=grid::unit(datagrid[,1], "native"), y=grid::unit(datagrid[,2], "native"), 
+		width=grid::unit(xstep, "native"), height=grid::unit(ystep, "native"), 
+		gp=grid::gpar(fill=gridcolors, lty=0, col=gridcolors))
 		
 	# then plot points, if not null
 	if(displayPoints) {
@@ -371,8 +375,10 @@ displayNnet <- function(nnet.model, datamatrix, datalabels, subset=NULL, display
 
 	# set up grid viewport
 	pos <- par("plt")
-	pushViewport(viewport(x=unit(pos[1], "npc"), y=unit(pos[3], "npc"), width=unit(pos[2]-pos[1], "npc"), height=unit(pos[4]-pos[3], "npc"), just=c("left", "bottom")))
-	pushViewport(viewport(xscale=xlim, yscale=ylim))
+	grid::pushViewport(grid::viewport(x=grid::unit(pos[1], "npc"), y=grid::unit(pos[3], "npc"), 
+		width=grid::unit(pos[2]-pos[1], "npc"), height=grid::unit(pos[4]-pos[3], "npc"), 
+		just=c("left", "bottom")))
+	grid::pushViewport(grid::viewport(xscale=xlim, yscale=ylim))
 
 
 	# create alpha blended colors from labels
@@ -389,7 +395,9 @@ displayNnet <- function(nnet.model, datamatrix, datalabels, subset=NULL, display
 
 	
 	# plot decision regions
-	grid.rect(x=unit(datagrid[,1], "native"), y=unit(datagrid[,2], "native"), width=unit(xstep, "native"), height=unit(ystep, "native"), gp=gpar(fill=gridcolors, lty=0))
+	grid::grid.rect(x=grid::unit(datagrid[,1], "native"), y=grid::unit(datagrid[,2], "native"), 
+		width=grid::unit(xstep, "native"), height=grid::unit(ystep, "native"), 
+		gp=grid::gpar(fill=gridcolors, lty=0))
 		
 	# then plot points, if not null
 	if(displayPoints) {

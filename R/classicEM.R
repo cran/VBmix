@@ -70,8 +70,8 @@ classicEM <- function(data, k, thres=0.1, maxit=NULL) {
 
 		for(j in 1:k) {
 			if(length(which(noupdate==j)) == 0) {
-				resp[,j] <- w[j] * dmnorm(data, mean=as.numeric(mean[[j]]), varcov=cov[[j]])
-				lnresp[,j] <- log(w[j]) + dmnorm(data, mean=as.numeric(mean[[j]]), varcov=cov[[j]], log=TRUE)
+				resp[,j] <- w[j] * mnormt::dmnorm(data, mean=as.numeric(mean[[j]]), varcov=cov[[j]])
+				lnresp[,j] <- log(w[j]) + mnormt::dmnorm(data, mean=as.numeric(mean[[j]]), varcov=cov[[j]], log=TRUE)
 			} else {
 				resp[,j] <- rep(0, n)
 				lnresp[,j] <- rep(-Inf, n)

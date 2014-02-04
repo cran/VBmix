@@ -5,10 +5,10 @@ RGBtoLab <- function(filename, filterWhite=FALSE, addCoords=TRUE) {
 	# only Lab data (no (x,y)) and filter white points
 	
 	# read file and build RGB matrix
-	im <- read.pnm(filename)
-	red <- getChannels(im, colors="red")
-	green <- getChannels(im, colors="green")
-	blue <- getChannels(im, colors="blue")
+	im <- pixmap::read.pnm(filename)
+	red <- pixmap::getChannels(im, colors="red")
+	green <- pixmap::getChannels(im, colors="green")
+	blue <- pixmap::getChannels(im, colors="blue")
 	
 	# algo uses values in [0,1], which is what getChannels returns.
 	

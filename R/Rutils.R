@@ -51,7 +51,7 @@ plotGmm <- function(mod, steps=200) {
 		}
 	}
 	
-	wireframe(pdf, shade = TRUE, 
+	lattice::wireframe(pdf, shade = TRUE, 
 		aspect = c(1, 1), 
 		xlab="", ylab="", zlab="", light.source = c(10,0,10))
 
@@ -89,7 +89,7 @@ datagen <- function(dreal=2, deff=6, npts=200, noise=0.1, genmean=rep(0,dreal), 
 	
 	print(gencov)
 	
-	data[,1:dreal] <- rmnorm(npts, mean=genmean, varcov=gencov)
+	data[,1:dreal] <- mnormt::rmnorm(npts, mean=genmean, varcov=gencov)
 	
 	if(dreal < deff) {
 		for(i in (dreal+1):deff) {
@@ -139,7 +139,7 @@ circlegen <- function(npts=200, radius=10, noise=1) {
 	
 	for(i in 1:npts) {
 		cur <- runif(1, min=0, max=2*pi)
-		dat[i,] <- c(radius*cos(cur), radius*sin(cur)) + rmnorm(1, varcov=noise*diag(2))
+		dat[i,] <- c(radius*cos(cur), radius*sin(cur)) + mnormt::rmnorm(1, varcov=noise*diag(2))
 	}
 	
 	return(dat)
@@ -641,7 +641,8 @@ semispheregen <- function(npts=200, radius=10, noise=1) {
 	for(i in 1:npts) {
 		theta <- runif(1, min=0, max=pi/2)
 		phi <- runif(1, min=-pi, max=pi)
-		dat[i,] <- c(radius*cos(theta)*cos(phi), radius*cos(theta)*sin(phi), radius*sin(theta)) + rmnorm(1, varcov=noise*diag(3))
+		dat[i,] <- c(radius*cos(theta)*cos(phi), radius*cos(theta)*sin(phi), radius*sin(theta)) + 
+			mnormt::rmnorm(1, varcov=noise*diag(3))
 	}
 	return(dat)
 }
@@ -695,8 +696,7 @@ reBuild <- function(v, voids, nonvoids, domains, placeholder=1) {
 	}
 	
 	v2[voids] <- placeholder
-	
-	v2 <- pixmapGrey(matrix(v2, nrow=sqrt(length(v2)), ncol=sqrt(length(v2))))
+	v2 <- pixmap::pixmapGrey(matrix(v2, nrow=sqrt(length(v2)), ncol=sqrt(length(v2))))
 
 	return(v2)
 	
@@ -705,7 +705,7 @@ reBuild <- function(v, voids, nonvoids, domains, placeholder=1) {
 
 
 pixmapToVector <- function(p) {
-	return(as.numeric(getChannels(p, "grey")))
+	return(as.numeric(pixmap::getChannels(p, "grey")))
 }
 
 

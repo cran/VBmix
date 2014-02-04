@@ -47,7 +47,7 @@ svm
 \examples{
 # extract 2 first variables and build data.frame
 temp <- buildFrame(irisdata, irislabels)
-iris.model <- svm(labels ~ ., data=temp, cost=100, gamma=1)
+iris.model <- e1071::svm(labels ~ ., data=temp, cost=100, gamma=1)
 displaySVM(iris.model, temp)
 }
 

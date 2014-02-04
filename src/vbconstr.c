@@ -754,6 +754,11 @@ SEXP vbconstr(SEXP models, SEXP ncomp, SEXP thres, SEXP maxit, SEXP rho) {
 		gsl_matrix_free(Ck[i]);
 	}
 	Free(mean_prior);
+	Free(mean_model);
+	Free(wish_model);
+	Free(meank);
+	Free(Sk);
+	Free(Ck);
 	
 	UNPROTECT(13);
 	

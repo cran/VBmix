@@ -2278,6 +2278,7 @@ SEXP rDirichlet(SEXP K, SEXP R_alpha) {
 	for(int i=0; i<k; i++) REAL(res)[i] = theta[i];
 	
 	UNPROTECT(1);
+	gsl_rng_free(r);
 	return(res);
 }
 

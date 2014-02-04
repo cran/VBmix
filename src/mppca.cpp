@@ -416,9 +416,11 @@ void end() {
 	gsl_vector_free(temp_vec2);
 	gsl_vector_free(temp_vec3);
 	gsl_vector_free(temp_vec4);
+	gsl_vector_free(temp_vec5);
 	gsl_permutation_free(temp_perm1);
 	gsl_permutation_free(temp_perm3);
 	gsl_permutation_free(temp_perm4);
+	gsl_permutation_free(temp_perm5);
 	gsl_eigen_symmv_free(temp_symmv1);
 	
 	Free(mins);
@@ -1227,7 +1229,7 @@ SEXP mppca(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit, SEXP qmax) {
 
 	Free(local_bounds);
 	
-	PROTECT(model_out = allocVector(VECSXP, 14));
+	PROTECT(model_out = allocVector(VECSXP, 15));
 	SET_VECTOR_ELT(model_out, 0, alpha_out);
 	SET_VECTOR_ELT(model_out, 1, numoment_out);
 	SET_VECTOR_ELT(model_out, 2, nua_out);
@@ -1246,7 +1248,7 @@ SEXP mppca(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit, SEXP qmax) {
 
 	
 	
-	PROTECT(dims1 = allocVector(VECSXP, 14));
+	PROTECT(dims1 = allocVector(VECSXP, 15));
 	SET_VECTOR_ELT(dims1, 0, mkChar("alpha"));
 	SET_VECTOR_ELT(dims1, 1, mkChar("numoment"));
 	SET_VECTOR_ELT(dims1, 2, mkChar("nua"));
