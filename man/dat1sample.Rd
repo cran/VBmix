@@ -8,7 +8,8 @@ dat1sample
 generates data elements according to SYN1 process (sample from a 2D GMM, linearly transformed with additive noise, see reference).
 }
 \usage{
-dat1sample(nelts, gmm, noise, transform, oldbounds = NULL, newbounds = NULL)
+dat1sample(nelts, gmm, noise, transform=generate2Dtransform(2), 
+	oldbounds = NULL, newbounds = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,7 +23,7 @@ number of elements to generate.
 additive noise magnitude.
 }
   \item{transform}{
-matrix defining linear transform.
+matrix defining linear transform. Defaults to I.
 }
   \item{oldbounds}{
 optional argument for sample rescaling. If not NULL, transmitted to setDomain as oldspan.

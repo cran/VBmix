@@ -8,7 +8,8 @@ dat3sample
 generates data elements according to SYN3 process (sample along a 2D circle with additive noise, and linearly transform to higher dimensional space with further noise addition, see reference).
 }
 \usage{
-dat3sample(nelts, radius, noise, transform, oldbounds = NULL, newbounds = NULL)
+dat3sample(nelts, radius, noise, transform=generate2Dtransform(2), 
+	oldbounds = NULL, newbounds = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,7 +23,7 @@ radius of the sphere to sample from.
 additive noise magnitude.
 }
   \item{transform}{
-matrix defining linear transform.
+matrix defining linear transform. Defaults to I.
 }
   \item{oldbounds}{
 optional argument for sample rescaling. If not NULL, transmitted to setDomain as oldspan.
@@ -35,7 +36,7 @@ optional argument for sample rescaling. If not NULL, transmitted to setDomain as
 matrix of sampled row-elements.
 }
 \references{
-runeau, P., Gelgon, M. and Picarougne, F. (2011) _Component-level aggregation of probabilistic PCA mixtures using variational-Bayes_, Tech Report, http://hal.archives-ouvertes.fr/docs/00/56/72/99/PDF/techrep.pdf.
+Bruneau, P., Gelgon, M. and Picarougne, F. (2011) _Component-level aggregation of probabilistic PCA mixtures using variational-Bayes_, Tech Report, http://hal.archives-ouvertes.fr/docs/00/56/72/99/PDF/techrep.pdf.
 }
 \author{
 Pierrick Bruneau

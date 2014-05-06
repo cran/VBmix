@@ -1,8 +1,8 @@
 eb723b61539feef013de476e68b5c50a *COPYING
-e889fcb69596ccbfdbf62d138c32e957 *DESCRIPTION
+161e296f6016e8338bf8c388871112d6 *DESCRIPTION
 b33231f91c5995891350c70fb81d45eb *NAMESPACE
 ca4bd392be08da8cd5cfd83491216ebb *R/RGBtoLab.R
-15db2ef271d411697efa4d8b5ff222a5 *R/Rutils.R
+aaee705ed7e10751eede09d0c16842ce *R/Rutils.R
 0a00185c34e7ac014a91caac39f5f788 *R/classicEM.R
 f301bb9e463498d5cbc3c4df8135d6ff *R/displayGraph.R
 244192d517526bdffac3383f5ce0cd3f *R/displayScatter.R
@@ -31,9 +31,9 @@ c0490697344422d7fcd027882f4a8060 *man/classicEM.Rd
 aada29862566dee328736c003a60158d *man/constrClassif.Rd
 93cca10dd532f69691b53456dcc6d66a *man/covgen.Rd
 1387df61e98b584169965506c6ac931c *man/dDirichlet.Rd
-b0d4a5f76295c7ebac5b8701a899b0e7 *man/dat1sample.Rd
+84f6541f795270a58a2618d69833a04a *man/dat1sample.Rd
 0a04e6b9eaaf04bd73b6c4129b2771c4 *man/dat2sample.Rd
-801bf24ab06c144e783ffbf499fac098 *man/dat3sample.Rd
+dd611d5a45bf00a6d646426a41bad167 *man/dat3sample.Rd
 1ed958bf949743b94e8d7b11c9c45f47 *man/datagen.Rd
 200020c72be2794b23405bfafb56039c *man/displayGraph.Rd
 db07bdc980dacdeb3d09282f9b8684d5 *man/displayNnet.Rd

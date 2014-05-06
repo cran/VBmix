@@ -843,18 +843,23 @@ pca <- function(dat, ncomp=NULL) {
 	
 	# diagonalisation
 	eig <- eigen(V %*% d1s2)
+
+	eigvecs <- Re(eig$vectors)
 	
 	# fonction pour M-normer chaque vecteur de notre ensemble de vecteurs propres
 	# en effet eigen les I-norme à 1, nous on veut utiliser D(1/s2)
-	A <- apply(eig$vectors, 2, function(X) { norm <- sqrt(as.numeric(t(X) %*% d1s2 %*% X))
+	A <- apply(eigvecs, 2, function(X) { norm <- sqrt(as.numeric(t(X) %*% d1s2 %*% X))
 	return(X / norm)})
 	
-	info <- "eigenvalues :"
-	for(i in 1:length(eig$values)) {
-		info <- paste(info, eig$values[i])
-	}
-	
-	print(info)
+	#info <- "eigenvalues :"
+	#for(i in 1:length(eig$values)) {
+	#	info <- paste(info, eig$values[i])
+	#}
+	#
+	#print(info)
+	eigvals <- Re(eig$values)
+	message("ncomp=", ncomp, ", with ", format(100 * sum(eigvals[1:ncomp]) / sum(eigvals), digits=2),
+		"% of retained variance")
 	
 	# U = transposee(A^{-1}), cf cours et TP ACP
 	U <- t(solve(A))
@@ -942,8 +947,10 @@ appendToList <- function(lst, obj, appendList=FALSE) {
 generate2Dtransform <- function(dims=4) {
 	transform <- matrix(rnorm(2*dims), nrow=dims, ncol=2)
 	# check linear independency <=> X^T %*% X has full rank
-	if(det(t(transform) %*% transform) < 0.001) {
-		stop("degeneracy detected. Perform again")
+	
+	while(det(t(transform) %*% transform) < 0.001) {
+		transform <- matrix(rnorm(2*dims), nrow=dims, ncol=2)
+		message("degenerate 2D transform - trying again...")
 	}
 	
 	transform <- gramschmidt(transform)
@@ -954,7 +961,7 @@ generate2Dtransform <- function(dims=4) {
 
 
 
-dat1sample <- function(nelts, gmm, noise, transform, oldbounds=NULL, newbounds=NULL) {
+dat1sample <- function(nelts, gmm, noise, transform=generate2Dtransform(2), oldbounds=NULL, newbounds=NULL) {
 	# generate elements
 	d <- dim(transform)[1]
 	dat <- gmmgen(gmm, nelts)[[1]]
@@ -990,7 +997,7 @@ dat2sample <- function(nelts, radius, noise, oldbounds=NULL, newbounds=NULL) {
 	
 }
 
-dat3sample <- function(nelts, radius, noise, transform, oldbounds=NULL, newbounds=NULL) {
+dat3sample <- function(nelts, radius, noise, transform=generate2Dtransform(2), oldbounds=NULL, newbounds=NULL) {
 	# noise for transform = circle noise / 10
 	d <- dim(transform)[1]
 	dat <- circlegen(nelts, radius, noise)
