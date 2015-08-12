@@ -2,6 +2,15 @@
 
 #include "utils.h"
 
+void toLower(double *source, double *dest, int n) {
+	for(int i=0; i<n; i++) {
+		for(int j=0; j<=i; j++) {
+			// !!! use n-1 instead of n (see reference in inst/lowerpack.pdf)
+			dest[i+j*(1-j+2*(n-1))/2] = source[j*n+i];
+		}
+	}
+}
+
 
 void printSxpIntVector(SEXP sxp) {
 	// assume double values
@@ -33,6 +42,48 @@ void printSxpMatrix(SEXP sxp) {
 		}
 		Rprintf("\n");
 	}
+}
+
+
+int imin(double *vec, int length, int incr) {
+	int ind = 0;
+	for(int i=0; i<length; i++) {
+		if(vec[ind*incr] > vec[i*incr]) ind = i;
+	}
+	return(ind);
+}
+
+int imax(double *vec, int length, int incr) {
+	int ind = 0;
+	for(int i=0; i<length; i++) {
+		if(vec[ind*incr] < vec[i*incr]) ind = i;
+	}
+	return(ind);
+}
+
+
+double vmin(double *vec, int length, int incr) {
+	double val=R_PosInf;
+	for(int i=0; i<length; i++) {
+		if(val > vec[i*incr]) val = vec[i*incr];
+	}
+	return(val);
+}
+
+double vmax(double *vec, int length, int incr) {
+	double val=R_NegInf;
+	for(int i=0; i<length; i++) {
+		if(val < vec[i*incr]) val = vec[i*incr];
+	}
+	return(val);
+}
+
+int allequal(int *vec1, int *vec2, int len) {
+	int res=1;
+	for(int i=0; i<len; i++) {
+		if(vec1[i] != vec2[i]) res=0;
+	}
+	return(res);
 }
 
 
@@ -396,21 +447,92 @@ SEXP gmmgen(SEXP mod, SEXP nitem) {
 }
 
 // multivariate normal density of a datamatrix
-SEXP mvndensity(SEXP mean, SEXP cov, SEXP data) {
-	
-	int d = length(mean);
+// refactored to support rescaling, and not use GSL
+SEXP mvndensity(SEXP mean, SEXP cov, SEXP data, SEXP rescaled) {
 	int n = INTEGER(getAttrib(data, R_DimSymbol))[0];
+	int d = INTEGER(getAttrib(data, R_DimSymbol))[1];	
+	SEXP res;
+	PROTECT(res=allocVector(REALSXP, n));
+
+	double *c_res = REAL(res);
+	double *c_mean = REAL(mean);
+	double *c_cov = REAL(cov);
+	double *c_ccopy;
+	double *c_data = REAL(data);
+	int c_rescaled = INTEGER(rescaled)[0];
+	double *c_samp = calloc(d, sizeof(double));
+	double c_lndet;
+	double *c_inverse;
+	int i_one = 1;
+	int dp1 = d+1;
+	int d2 = d*d;
+
+	// detect type in "general", "diagonal" and "spherical"
+	char *type;
+	double refval;
+	int found=0;
+	for(int i=0; i<d; i++) {
+		for(int j=0; j<i; j++) {
+			if(c_cov[j*d+i] != 0.0) found = 1;
+		}
+	}
+
+	if(found) {
+		type = "general";
+		c_ccopy = calloc(d*d, sizeof(double));
+		F77_CALL(dcopy)(&d2, c_cov, &i_one, c_ccopy, &i_one);
+		c_inverse = calloc(d*d, sizeof(double));
+	} else {
+		refval = c_cov[0];
+		for(int i=1; i<d; i++) {
+			if(c_cov[i*d+i] != refval) found = 1;
+		}
+		if(found) {
+			type = "diagonal";
+			c_ccopy = calloc(d, sizeof(double));
+			F77_CALL(dcopy)(&d, c_cov, &dp1, c_ccopy, &i_one);
+			c_inverse = calloc(d, sizeof(double));
+		} else {
+			type = "spherical";
+			c_ccopy = calloc(1, sizeof(double));
+			c_ccopy[0] = c_cov[0];
+			c_inverse = calloc(1, sizeof(double));
+		}
+	}
+
+	// perform pre-decompositions
+	symdecomp(c_ccopy, c_inverse, &c_lndet, d, type);
+
+	for(int i=0; i<n; i++) {
+		F77_CALL(dcopy)(&d, c_data+i, &n, c_samp, &i_one);
+		if(c_rescaled == TRUE) {
+			c_res[i] = drmnorm(c_samp, c_mean, c_lndet, c_inverse, d, 0, type);
+		} else {
+			c_res[i] = dmnorm(c_samp, c_mean, c_lndet, c_inverse, d, 0, type);
+		}
+	}
+	
+	free(c_samp);
+	free(c_inverse);
+	UNPROTECT(1);
+	return(res);
+	
+}
+
+
+SEXP mvnradiusdensity(SEXP cov, SEXP radii) {
+	
+	int d = INTEGER(getAttrib(cov, R_DimSymbol))[0];
+	int n = length(radii);
 	int i;
 	double val;
 	gsl_permutation *perm = gsl_permutation_alloc(d);
 	
-	gsl_vector *mn = gsl_vector_calloc(d);
 	gsl_matrix *cv = gsl_matrix_calloc(d,d);
-	gsl_matrix *dat = gsl_matrix_calloc(n,d);
+	gsl_vector *rad = gsl_vector_calloc(n);
 	
-	SXPtoVector(mn, mean);
 	SXPtoMatrix(cv, cov);
-	SXPtoMatrix(dat, data);
+	SXPtoVector(rad, radii);
 	
 	// return result in a vector
 	gsl_vector *result = gsl_vector_calloc(n);
@@ -429,19 +551,19 @@ SEXP mvndensity(SEXP mean, SEXP cov, SEXP data) {
 	constant += - (d / 2.0) * gsl_sf_log(2 * M_PI) - 0.5 * lndet;
 
 	
-	gsl_vector *meanvec = gsl_vector_alloc(d);
-	gsl_vector *tempvec = gsl_vector_alloc(d);
-	gsl_vector_view view1;
+	//gsl_vector *meanvec = gsl_vector_alloc(d);
+	//gsl_vector *tempvec = gsl_vector_alloc(d);
+	//gsl_vector_view view1;
 	
 	for(i=0; i<n; i++) {
-		view1 = gsl_matrix_row(dat, i);
-		gsl_vector_memcpy(meanvec, &view1.vector);
-		gsl_vector_sub(meanvec, mn);
+		//view1 = gsl_matrix_row(dat, i);
+		//gsl_vector_memcpy(meanvec, &view1.vector);
+		//gsl_vector_sub(meanvec, mn);
+		//
+		//gsl_blas_dsymv(CblasUpper, -0.5, inverse, meanvec, 0.0, tempvec);
+		//gsl_blas_ddot(meanvec, tempvec, &val);
 		
-		gsl_blas_dsymv(CblasUpper, -0.5, inverse, meanvec, 0.0, tempvec);
-		gsl_blas_ddot(meanvec, tempvec, &val);
-		
-		gsl_vector_set(result, i, exp(constant + val));
+		gsl_vector_set(result, i, exp(constant - 0.5 * gsl_vector_get(rad,i)));
 	}
 	
 	SEXP res;
@@ -449,19 +571,147 @@ SEXP mvndensity(SEXP mean, SEXP cov, SEXP data) {
 	vectorToSXP(&res, result);
 	
 	gsl_permutation_free(perm);
-	gsl_vector_free(mn);
 	gsl_matrix_free(cv);
-	gsl_matrix_free(dat);
+	gsl_vector_free(rad);
 	gsl_vector_free(result);
 	gsl_matrix_free(decomp);
 	gsl_matrix_free(inverse);
-	gsl_vector_free(meanvec);
-	gsl_vector_free(tempvec);
+	//gsl_vector_free(meanvec);
+	//gsl_vector_free(tempvec);
 	
 	UNPROTECT(1);
 	return(res);
 	
 }
+
+void symdecomp(double *mat, double *inverse, double *lndet, int n, const char *type) {
+	// from an input symmetric positive definite matrix (typically a covariance matrix)
+	// compute summaries that accelerate dmnorm and likelihood computations
+
+	// added optimization for diagonal matrices
+
+	int i_one=1;
+	int size;
+	if(!strcmp(type, "general")) {
+		size = n*n;
+	} else if(!strcmp(type, "diagonal")) {
+		size = n;
+	} else {
+		size = 1;
+	}
+	int info=0;
+	
+	F77_CALL(dcopy)(&size, mat, &i_one, inverse, &i_one);
+	// compute Cholesky only in general case
+	if(!strcmp(type, "general")) {
+		F77_CALL(dpotrf)("L", &n, inverse, &n, &info);
+	}
+	
+	lndet[0] = 0.0;
+	for(int j=0; j<n; j++) {
+		if(!strcmp(type, "general")) {
+			lndet[0] = lndet[0] + log(inverse[j*n+j]);
+		} else if(!strcmp(type, "diagonal")) {
+			lndet[0] = lndet[0] + log(inverse[j]);
+		} else {
+			lndet[0] = lndet[0] + log(inverse[0]);
+		}
+	}
+
+	if(!strcmp(type, "general")) {
+		// if det computed from Cholesky
+		lndet[0] = lndet[0] * 2.0;
+	}
+
+	if(!strcmp(type, "general")) {
+		F77_CALL(dpotri)("L", &n, inverse, &n, &info);
+	} else if(!strcmp(type, "diagonal")) {
+		for(int j=0; j<n; j++) inverse[j] = 1.0 / inverse[j];
+	} else {
+		inverse[0] = 1.0 / inverse[0];
+	}
+	
+	// make symmetric if type="general"
+	// FIX: useless if only lower part used through calculations
+	//if(!strcmp(type, "general")) {
+	//	for(int i=0; i<n; i++) {
+	//		for(int j=(i+1); j<n; j++) {
+	//			inverse[j*n+i] = inverse[i*n+j];
+	//		}
+	//	}		
+	//}
+
+}
+
+
+double dmnorm(double *samp, double *mean, double lndetcov, double *inverse, int d, int logd, const char *type) {
+	// fast implementation using pre-computed lndet and inverse cov, to allow incremental computation
+	// rather use cholesky decomp -> then just Ax and ddot suffices
+	double *vec = calloc(d, sizeof(double));
+	double *vec2 = calloc(d, sizeof(double));
+	int i_one = 1;
+	double alpha = -1.0;
+	double beta = 0.0;
+	F77_CALL(dcopy)(&d, samp, &i_one, vec, &i_one);
+	F77_CALL(daxpy)(&d, &alpha, mean, &i_one, vec, &i_one);
+
+	alpha = 1.0;
+	double res=0.0;
+	if(!strcmp(type, "general")) {
+		F77_CALL(dsymv)("L", &d, &alpha, inverse, &d, vec, &i_one, &beta, vec2, &i_one);
+		res = F77_CALL(ddot)(&d, vec, &i_one, vec2, &i_one);
+	} else if(!strcmp(type, "diagonal")) {
+		for(int i=0; i<d; i++) res += inverse[i] * pow(vec[i], 2.0);
+	} else {
+		for(int i=0; i<d; i++) res += inverse[0] * pow(vec[i], 2.0);
+	}
+
+	// compute in log to prevent singularities on log(det)
+	res = -d*log(2.0*M_PI)/2.0 -0.5*lndetcov -0.5*res;
+	if(!logd) {
+		res = exp(res);
+	}
+	
+	free(vec);
+	free(vec2);
+	return(res);
+}
+
+// rescaled unnormalized dnorm, so that BIC criterion is insensitive to dimensionality
+// -> no 2PI const
+// -> d power on detcov to limit tendency of det to explode exponentially
+// -> -d to the squared norm in the exp() term, as is shown to be the expectation of squared radius
+double drmnorm(double *samp, double *mean, double lndetcov, double *inverse, int d, int logd, const char *type) {
+	double *vec = calloc(d, sizeof(double));
+	double *vec2 = calloc(d, sizeof(double));
+	int i_one = 1;
+	double alpha = -1.0;
+	double beta = 0.0;
+	F77_CALL(dcopy)(&d, samp, &i_one, vec, &i_one);
+	F77_CALL(daxpy)(&d, &alpha, mean, &i_one, vec, &i_one);
+
+	alpha = 1.0;
+	double res=0.0;
+	if(!strcmp(type, "general")) {
+		F77_CALL(dsymv)("L", &d, &alpha, inverse, &d, vec, &i_one, &beta, vec2, &i_one);
+		res = F77_CALL(ddot)(&d, vec, &i_one, vec2, &i_one);
+	} else if(!strcmp(type, "diagonal")) {
+		for(int i=0; i<d; i++) res += inverse[i] * pow(vec[i], 2.0);
+	} else {
+		for(int i=0; i<d; i++) res += inverse[0] * pow(vec[i], 2.0);
+	}
+
+	// compute in log to prevent singularities on log(det)
+	res = -(1.0/(2.0*d))*lndetcov - 0.5*(res-d);
+	if(!logd) {
+		res = exp(res);
+	}
+	
+	free(vec);
+	free(vec2);
+	return(res);	
+}
+
 
 
 // gmm density of a data matrix
@@ -470,16 +720,19 @@ SEXP gmmdensity(SEXP mod, SEXP data) {
 	
 	SEXP curvect;
 	SEXP totvect;
-	
+	SEXP r_false = PROTECT(allocVector(INTSXP, 1));
+	INTEGER(r_false)[0] = 0;
+
 	int n = INTEGER(getAttrib(data, R_DimSymbol))[0];
 	int k = length(getListElement(mod, "w"));
 	int i;
+
 	
 	gsl_vector *curgslvect = gsl_vector_calloc(n);
 	gsl_vector *totgslvect = gsl_vector_calloc(n);
 	
 	for(i=0; i<k; i++) {
-		curvect = mvndensity(VECTOR_ELT(getListElement(mod, "mean"), i), VECTOR_ELT(getListElement(mod, "cov"), i), data);
+		curvect = mvndensity(VECTOR_ELT(getListElement(mod, "mean"), i), VECTOR_ELT(getListElement(mod, "cov"), i), data, r_false);
 		SXPtoVector(curgslvect, curvect);
 		gsl_vector_scale(curgslvect, REAL(getListElement(mod, "w"))[i] );
 		gsl_vector_add(totgslvect, curgslvect);
@@ -491,7 +744,7 @@ SEXP gmmdensity(SEXP mod, SEXP data) {
 	gsl_vector_free(curgslvect);
 	gsl_vector_free(totgslvect);
 	
-	UNPROTECT(1);
+	UNPROTECT(2);
 	return(totvect);
 	
 }
@@ -1994,6 +2247,31 @@ void upperComplete(gsl_matrix *mat) {
 	}
 }
 
+void lowerComplete(double *mat, int n) {
+	// complete upper triangle
+	for(int i=0; i<n; i++) {
+		for(int j=0; j<i; j++) {
+			mat[i*n+j] = mat[j*n+i];
+		}
+	}
+}
+
+void fillUpper(double *mat, int d) {
+	for(int i=1; i<d; i++) {
+		for(int j=0; j<i; j++) {
+			mat[j+d*i] = mat[i+d*j];
+		}
+	}
+}
+
+void fillLower(double *mat, int d) {
+	for(int i=1; i<d; i++) {
+		for(int j=0; j<i; j++) {
+			mat[i+d*j] = mat[j+d*i];
+		}
+	}
+}
+
 SEXP sort_index(SEXP vec, SEXP order) {
 	double *ptr = REAL(coerceVector(vec, REALSXP));
 	int len = length(vec);
@@ -2076,82 +2354,6 @@ int contains(int seekval, int size, int *vals) {
 	return 0;
 }
 
-SEXP Rdct(SEXP vect) {
-	int i;
-	int len = length(vect);
-	
-	double *in = REAL(vect);
-	double out[len];
-	
-	fftw_plan plan = fftw_plan_r2r_1d(len, in, out, FFTW_REDFT00, 0);	
-	fftw_execute(plan);
-	
-	SEXP ret;
-	PROTECT(ret=allocVector(REALSXP, len));
-	
-	for(i=0; i<len; i++) {
-		REAL(ret)[i] = out[i];
-	}
-	
-	fftw_destroy_plan(plan);
-	UNPROTECT(1);
-	return(ret);
-}
-
-SEXP Rdct2D(SEXP mat) {
-	// apparently, fftw functions take double *in as contiguous row-major order ; and R uses column major order
-	// due to this, a transpose of the matrix to DCT is input. inversion of the row/col nums allows the correct transform.
-	
-	// IDCT is obtained with same function, and result divided by 2*(ncol-1)*2*(nrow-1)
-	
-	int i;
-	int nrow = INTEGER(getAttrib(mat, R_DimSymbol))[0];
-	int ncol = INTEGER(getAttrib(mat, R_DimSymbol))[1];
-	double *in = REAL(mat);
-	double out[nrow * ncol];
-	
-	fftw_plan plan = fftw_plan_r2r_2d(ncol, nrow, in, out, FFTW_REDFT00, FFTW_REDFT00, 0);
-	fftw_execute(plan);
-	
-	SEXP ret;
-	PROTECT(ret=allocMatrix(REALSXP, nrow, ncol));
-	in = REAL(ret);
-	
-	for(i=0; i<(nrow*ncol); i++) {
-		in[i] = out[i];
-	}
-	
-	
-	fftw_destroy_plan(plan);
-	UNPROTECT(1);
-	return(ret);
-}
-
-SEXP RinvDct2D(SEXP mat) {
-	// apparently, fftw functions take double *in as contiguous row-major order ; and R uses column major order
-	// due to this, a transpose of the matrix to DCT is input. inversion of the row/col nums allows the correct transform.
-	int i;
-	int nrow = INTEGER(getAttrib(mat, R_DimSymbol))[0];
-	int ncol = INTEGER(getAttrib(mat, R_DimSymbol))[1];
-	double *in = REAL(mat);
-	double out[nrow * ncol];
-	
-	fftw_plan plan = fftw_plan_r2r_2d(ncol, nrow, in, out, FFTW_REDFT00, FFTW_REDFT00, 0);
-	fftw_execute(plan);
-	
-	SEXP ret;
-	PROTECT(ret=allocMatrix(REALSXP, nrow, ncol));
-	in = REAL(ret);
-	
-	for(i=0; i<(nrow*ncol); i++) {
-		in[i] = out[i];
-	}
-	
-	
-	fftw_destroy_plan(plan);
-	UNPROTECT(1);
-	return(ret);	
-}
 
 
 SEXP control(SEXP points, SEXP dmin) {
@@ -2282,6 +2484,63 @@ SEXP rDirichlet(SEXP K, SEXP R_alpha) {
 	return(res);
 }
 
+// dist between 2 groups of elements, wrt to a mahalanobis metric
+SEXP gdist(SEXP g1, SEXP g2, SEXP metric) {
+	PROTECT(g1 = coerceVector(g1, REALSXP));
+	PROTECT(g2 = coerceVector(g2, REALSXP));
+	// metric is a list:
+	// if length=1, dists between elts in g1 and g2 are computed wrt this metric,
+	// if length=length(g2), metrics are associated with elements in g2.
+	//PROTECT(metric = coerceVector(metric, REALSXP));
+	SEXP curmetric;
+	double *c_metric;
+	int metricMode = length(metric);
 
+	int n1 = INTEGER(getAttrib(g1, R_DimSymbol))[0];
+	int n2 = INTEGER(getAttrib(g2, R_DimSymbol))[0];
+	int d = INTEGER(getAttrib(g1, R_DimSymbol))[1];	
+	double *c_g1 = REAL(g1);
+	double *c_g2 = REAL(g2);
+
+	//double *c_metric = REAL(metric);
+	double *vec1 = calloc(d, sizeof(double));
+	double *vec2 = calloc(d, sizeof(double));
+	double *c_inverse = calloc(d*d, sizeof(double));
+	int i1=1;
+	double alpha;
+	double beta=0.0;
+	double lndet = 0.0;
+
+	SEXP dists;
+	PROTECT(dists=allocMatrix(REALSXP,n1,n2));
+	double *c_dists=REAL(dists);
+
+	if(metricMode == 1) {
+		c_metric = REAL(VECTOR_ELT(metric, 0));
+	}
+
+	for(int j=0; j<n2; j++) {
+		// inverted loop so that matrices are decomposed only once
+		if(metricMode == n2) {
+			c_metric = REAL(VECTOR_ELT(metric, j));
+			symdecomp(c_metric, c_inverse, &lndet, d, "general");
+		}
+		for(int i=0; i<n1; i++) {
+			F77_CALL(dcopy)(&d, c_g1+i, &n1, vec1, &i1);
+			alpha=-1.0;
+			F77_CALL(daxpy)(&d, &alpha, c_g2+j, &n2, vec1, &i1);
+			alpha=1.0;
+
+			F77_CALL(dsymv)("L", &d, &alpha, c_inverse, &d, vec1, &i1, &beta, vec2, &i1);
+			c_dists[j*n1+i] = sqrt(F77_CALL(ddot)(&d, vec1, &i1, vec2, &i1));
+		}
+	}
+
+	free(vec1);
+	free(vec2);
+	UNPROTECT(3);
+	return(dists);
+
+}
 
 

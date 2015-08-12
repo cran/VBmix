@@ -29,7 +29,7 @@ Pierrick Bruneau
 newGmm
 }
 \examples{
-temp <- classicEM(irisdata, 4)
+temp <- EM(irisdata, 4)
 temp2 <- getLabels(temp, irisdata)
 }
 

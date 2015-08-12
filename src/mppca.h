@@ -3,7 +3,7 @@
 #ifndef MPPCA_H
 #define MPPCA_H
 
-#include <QtCore>
+//#include <QtCore>
 #include <iostream>
 
 #include <gsl/gsl_matrix.h>
@@ -111,7 +111,8 @@ extern "C" {
 	void displayBound(int);
 	void updateSuffStats();
 
-	void writeMatrix(gsl_matrix *);
+	// remove Qt deps
+	//void writeMatrix(gsl_matrix *);
 	
 	SEXP getResp(SEXP, SEXP);
 }

@@ -14,7 +14,8 @@ mymvn2plot <- function (w, mu, sigma, k = 15, alone = FALSE, col = NA, alphacol=
     x <- s[1] * cos(theta)
     y <- s[2] * sin(theta)
     xy <- cbind(c(x, -x, -x, x), c(y, y, -y, -y))
-	# OK : ici les vecteurs V sont en ligne, donc on prend cos(t) * v1 + sin(t) * v2, ce qui correspond bien à la courbe paramétrique d'un cercle/ellipse.
+	# OK : ici les vecteurs V sont en ligne, donc on prend cos(t) * v1 + sin(t) * v2
+	# ce qui correspond bien a la courbe parametrique d'un cercle/ellipse.
     xy <- xy %*% V
     xy <- sweep(xy, MARGIN = 2, STATS = mu, FUN = "+")
     if (alone) {
@@ -74,7 +75,7 @@ mySmoothScatter <- function(data, model, xlim, ylim) {
 
 getColor <- function(index) {
 	# color index set selected from colors() returned values
-	# 1ère couleur=black
+	# 1st color=black
 	cols=c(24,74,32,26, 57,31, 83, 101, 90, 116, 114, 126, 551)
 	cycle <- sum((index %/% 13) > 0) # hack modulo for a regular cycle: 1..i..n 1..i...
 	
@@ -265,7 +266,7 @@ gridGen <- function(xlim=c(-10, 10), ylim=c(-10, 10), step=50) {
 	return(res)
 }
 
-# mettre des factors pour variables catégorielle, sinon SVM fait une espèce de régression...
+# mettre des factors pour variables categorielle, sinon SVM fait une espece de regression...
 # build data frame from usual format
 buildFrame <- function(datamatrix, labels, dims=1:2) {
 	datamatrix <- as.data.frame(datamatrix)

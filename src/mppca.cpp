@@ -2,26 +2,27 @@
 
 #include "mppca.h"
 
-void writeMatrix(gsl_matrix *mat) {
-	QFile file("/Users/Pierrick/R/log.txt");
-	file.open(QIODevice::Append);
-	
-	QTextStream out(&file);	
-	// write line to identify output
-	out << "logged at" << QDateTime::currentDateTime().toString() << "\n";
-	out << "-------------------\n";
-	
-	int i,j;
-	QString curnum;
-	for(i=0; i<mat->size1; i++) {
-		for(j=0; j<mat->size2; j++) {
-			curnum.setNum(gsl_matrix_get(mat, i, j), 'f');
-			out << curnum << " ";
-		}
-		out << "\n";
-	}
-	out << "\n";
-}
+// remove deps on Qt
+//void writeMatrix(gsl_matrix *mat) {
+//	QFile file("/Users/Pierrick/R/log.txt");
+//	file.open(QIODevice::Append);
+//	
+//	QTextStream out(&file);	
+//	// write line to identify output
+//	out << "logged at" << QDateTime::currentDateTime().toString() << "\n";
+//	out << "-------------------\n";
+//	
+//	int i,j;
+//	QString curnum;
+//	for(i=0; i<mat->size1; i++) {
+//		for(j=0; j<mat->size2; j++) {
+//			curnum.setNum(gsl_matrix_get(mat, i, j), 'f');
+//			out << curnum << " ";
+//		}
+//		out << "\n";
+//	}
+//	out << "\n";
+//}
 
 
 // HOWTO get rows from a R matrix into a GSL program :

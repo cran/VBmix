@@ -8,7 +8,7 @@ mvndensity
 get densities of a set of elements w.r.t a multivariate normal.
 }
 \usage{
-mvndensity(mean, cov, data)
+mvndensity(mean, cov, data, rescaled=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,6 +20,9 @@ covariance matrix of the multivariate normal.
 }
   \item{data}{
 matrix of row-elements.
+}
+\item{rescaled}{
+	if TRUE, a variant accouting for data dimensionality is computed.
 }
 }
 \value{

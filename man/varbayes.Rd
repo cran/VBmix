@@ -51,7 +51,7 @@ Beal, M. J. (2003) \emph{Variational Algorithms for approximate inference}, PhD 
 Pierrick Bruneau
 }
 \seealso{
-classicEM extractSimpleModel
+EM extractSimpleModel
 }
 \examples{
 temp <- varbayes(irisdata, 20)

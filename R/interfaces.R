@@ -2,10 +2,42 @@
 
 # interfaces to C entry points
 
+mkmeans <- function(dat, k, maxiter=100, seeds=NULL) {
+	if(is.null(seeds)) {
+		seeds <- sample(0:(dim(dat)[1]-1), k)
+	}
+	.Call("mkmeans", dat, k, maxiter, seeds, PACKAGE="VBmix")
+}
+
+gdist <- function(g1, g2, metric=NULL) {
+	if(is.null(metric)) metric <- diag(dim(g1)[2])
+	# cast to list
+	if(is.matrix(metric)) {
+		dummy <- list()
+		dummy[[1]] <- metric
+		metric <- dummy
+	}
+	.Call("gdist", g1, g2, metric, PACKAGE="VBmix")
+}
+
 varbayes <- function(data, ncomp, thres=0.1, maxit=NULL) {
 	if(class(data) == "data.frame") data <- as.matrix(data)
 	.Call("varbayes", data, ncomp, thres, maxit, PACKAGE="VBmix")
 }
+
+
+EM <- function(data, ncomp, model=c("general", "diagonal", "spherical"), class=FALSE,
+	thres=0.1, maxit=NULL, rbic=FALSE, debug=FALSE) {
+		model <- match.arg(model)
+		if(class(data) == "data.frame") data <- as.matrix(data)
+		seeds <- (1:dim(data)[1])[!duplicated(data)]
+		seeds <- sample(seeds, ncomp) # seeds for k-means like init
+		.Call("EM", data, ncomp, model, class, thres, maxit, rbic, seeds, debug, PACKAGE="VBmix")
+}
+
+#test <- function(arg=TRUE) {
+#	.Call("test", arg, PACKAGE="VBmix")
+#}
 
 vbcomp <- function(models, ncomp, thres=0.1, maxit=NULL) {
 	# in case it is not already, normalize weights of input model
@@ -38,20 +70,21 @@ getCouple <- function(vec1, vec2) {
 	.Call("couple", vec1, vec2, PACKAGE="VBmix")
 }
 
-readLabelFile <- function(name) {
-	.Call("readLabelFile", name, PACKAGE="VBmix")
-}
-
-readPixmapFile <- function(name) {
-	dat <- .Call("readPixmapFile", name, PACKAGE="VBmix")
-	datmod <- list()
-	print("post processing...")
-	for(i in 1:length(dat)) {
-		dat[[i]] <- (255-dat[[i]])/255
-		dat[[i]] <- pixmap::pixmapGrey(dat[[i]])
-	}
-	return(dat)
-}
+# remove Qt deps
+#readLabelFile <- function(name) {
+#	.Call("readLabelFile", name, PACKAGE="VBmix")
+#}
+#
+#readPixmapFile <- function(name) {
+#	dat <- .Call("readPixmapFile", name, PACKAGE="VBmix")
+#	datmod <- list()
+#	print("post processing...")
+#	for(i in 1:length(dat)) {
+#		dat[[i]] <- (255-dat[[i]])/255
+#		dat[[i]] <- pixmap::pixmapGrey(dat[[i]])
+#	}
+#	return(dat)
+#}
 
 jsmc <- function(mod1, mod2, nsamp=5000) {
 	.Call("jsmc", mod1, mod2, nsamp, PACKAGE="VBmix")
@@ -99,19 +132,19 @@ sort_index <- function(vec, order=0) {
 	.Call("sort_index", vec, order, PACKAGE="VBmix")
 }
 
-Rdct <- function(vect) {
-	.Call("Rdct", vect, PACKAGE="VBmix")
-	#.Call(Rdct, vect)
-}
-
-Rdct2D <- function(mat) {
-	res <- .Call("Rdct2D", t(mat), PACKAGE="VBmix")
-	return(t(res))
-}
-
-RinvDct2D <- function(mat) {
-	.Call("RinvDct2D", t(mat), PACKAGE="VBmix")
-}
+#Rdct <- function(vect) {
+#	.Call("Rdct", vect, PACKAGE="VBmix")
+#	#.Call(Rdct, vect)
+#}
+#
+#Rdct2D <- function(mat) {
+#	res <- .Call("Rdct2D", t(mat), PACKAGE="VBmix")
+#	return(t(res))
+#}
+#
+#RinvDct2D <- function(mat) {
+#	.Call("RinvDct2D", t(mat), PACKAGE="VBmix")
+#}
 
 
 extractSimpleModel <- function(model=model, labels=FALSE) {
@@ -146,10 +179,13 @@ mvngen <- function(mean, cov, nitem) {
 	.Call("mvngen", mean, cov, nitem, PACKAGE="VBmix")
 }
 
-mvndensity <- function(mean, cov, data) {
-	.Call("mvndensity", mean, cov, data, PACKAGE="VBmix")
+mvndensity <- function(mean, cov, data, rescaled=FALSE) {
+	.Call("mvndensity", mean, cov, data, rescaled, PACKAGE="VBmix")
 }
 
+mvnradiusdensity <- function(cov, radii) {
+	.Call("mvnradiusdensity", cov, radii, PACKAGE="VBmix")
+}
 
 multinomial <- function(weights, k) {
 	.Call("multinomial", weights, k, PACKAGE="VBmix")

@@ -18,29 +18,19 @@ AC_CHECK_LIB(gslcblas, cblas_dgemm, ,
 	AC_MSG_ERROR("gslcblas library not found"))
 AC_CHECK_LIB(gsl, gsl_blas_dgemm, , 
 	AC_MSG_ERROR("gsl library not found"))
-AC_CHECK_LIB(fftw3, fftw_execute, , 
-	AC_MSG_ERROR("fftw3 library not found"))
-AC_CHECK_LIB(QtCore, main, [HAVE_QT=1], [HAVE_QT=0])
-if test ${HAVE_QT} = 0; then
-	AC_CHECK_HEADER(/Library/Frameworks/QtCore.framework/Headers/qconfig.h, , AC_MSG_ERROR("QtCore library not found"))
-fi
 
 : ${TP_ARCH=`uname -s`}
 case "${TP_ARCH}" in
 	*Darwin*)
-	CPPFLAGS="$CPPFLAGS -I/Library/Frameworks/QtCore.framework/Headers"
-	LIBS="$LIBS -framework QtCore -lfftw3 -lgsl -lgslcblas -lm"
+	LIBS="$LIBS -lgsl -lgslcblas -lm -lblas -llapack -lgfortran"
 	;;
 	*)
-	QTFLAGS=`pkg-config QtCore --cflags`
-	CPPFLAGS="$CPPFLAGS $QTFLAGS"
-	LIBS="$LIBS -lQtCore -lfftw3 -lgsl -lgslcblas"
+	LIBS="$LIBS -lgsl -lgslcblas -lblas -llapack -lgfortran"
 	;;
 esac
 
 #  	*Linux*)
-#	CPPFLAGS="$CPPFLAGS -I/usr/include/qt4 -I/usr/include/qt4/QtCore"
-#	LIBS="$LIBS -lQtCore -lfftw3 -lgsl -lgslcblas"
+#	LIBS="$LIBS -lgsl -lgslcblas"
 #	;;
 #  *)
 #	AC_MSG_ERROR([Unsupported operating system: ${TP_ARCH}])

@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Installation
 ------------
 
-R CMD INSTALL <package_name>
+R CMD INSTALL <package_name> from a terminal prompt,
+or install.packages("VBmix") from an interactive session
 
 Usage
 -----

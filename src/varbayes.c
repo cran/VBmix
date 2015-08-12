@@ -475,7 +475,8 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 	double newbound;
 	
 	int count = 1;
-	Rprintf("it %d bound is %f\n", count, bound);
+	// PBR: deactivate
+	//Rprintf("it %d bound is %f\n", count, bound);
 
 	
 	// create data for model to estimate
@@ -850,7 +851,8 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 		newbound = pxlog + pzlog + ppilog + pmulog - qzlog - qpilog - qmulog;
 		
 		count++;
-		Rprintf("it %d bound is %f\n", count, newbound);
+		//CURPBR
+		//Rprintf("it %d bound is %f\n", count, newbound);
 		
 		// store nk and agitation
 		if(count == 2) {
@@ -883,7 +885,7 @@ SEXP varbayes(SEXP data, SEXP ncomp, SEXP thres, SEXP maxit) {
 		bound = newbound;
 	}
 
-	
+	Rprintf("bound eventually is %f\n", newbound);
 	// 9 : build return objects
 	SEXP ret, mod, al, be, nu, me, wi, re;
 	SEXP mecur, wicur, dims1, dims2;

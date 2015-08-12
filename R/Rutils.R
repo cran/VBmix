@@ -187,7 +187,6 @@ gaussianKL <- function(N0, N1) {
 }
 
 getQforComp <- function(loadings, tau=1.0, verbose=FALSE, quick=FALSE) {
-	# print plutot séries de KL...
 	d <- length(loadings[,1])
 	q <- length(loadings[1,])
 	
@@ -819,7 +818,7 @@ setDomain <- function(dat, span=10, oldspan=NULL) {
 
 
 pca <- function(dat, ncomp=NULL) {
-	# matrice convertie au cas où format incompatible
+	# force-cast to matrix
 	dat <- as.matrix(dat)
 
 	# if ncomp is NULL, all columns are selected
@@ -832,13 +831,13 @@ pca <- function(dat, ncomp=NULL) {
 	D <- diag(rep(1/n, n))
 	one <- as.matrix(rep(1,n))
 	
-	# données centrées (formule cours - on peut faire la même chose avec une simple boucle)
+	# centred data
 	Y <- (diag(n) - one %*% t(one) %*% D) %*% dat
 	
 	# variance
 	V <- t(Y) %*% D %*% Y
 	
-	# métrique D(1/s2)
+	# D(1/s2) metric
 	d1s2 <- diag(1/diag(V))
 	
 	# diagonalisation
@@ -847,7 +846,7 @@ pca <- function(dat, ncomp=NULL) {
 	eigvecs <- Re(eig$vectors)
 	
 	# fonction pour M-normer chaque vecteur de notre ensemble de vecteurs propres
-	# en effet eigen les I-norme à 1, nous on veut utiliser D(1/s2)
+	# en effet eigen les I-norme a 1, nous on veut utiliser D(1/s2)
 	A <- apply(eigvecs, 2, function(X) { norm <- sqrt(as.numeric(t(X) %*% d1s2 %*% X))
 	return(X / norm)})
 	
@@ -864,10 +863,10 @@ pca <- function(dat, ncomp=NULL) {
 	# U = transposee(A^{-1}), cf cours et TP ACP
 	U <- t(solve(A))
 	
-	# données transformées (XU dans le TP)
+	# transformed data (XU dans le TP)
 	reduce <- Y %*% U
 	
-	# on retourne les ncomp premières composantes (2D par défaut)
+	# on retourne les ncomp premieres composantes (2D par defaut)
 	return(reduce[,1:ncomp])
 }
 
@@ -880,20 +879,16 @@ getDataLikelihood <- function(gmm, dat) {
 }
 
 
-
-
 getBic <- function(gmm, dat) {
 	lnL <- getDataLikelihood(gmm, dat)
 	n <- length(dat[,1])
 	d <- length(dat[1,])
 	k <- length(gmm$w)
-	paramsize <- k + k*d + k*(d*(d+1))/2
+	# constraint on w
+	paramsize <- (k-1) + k*d + k*(d*(d+1))/2
 	res <- -2 * lnL + paramsize * log(n)
 	return(res)
 }
-
-
-
 
 
 getVarbayesResp <- function(data, model) {

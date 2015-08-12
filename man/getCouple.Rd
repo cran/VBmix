@@ -33,8 +33,7 @@ flock of agents_, Evolutionary Computation, Volume 15, Number 3, Pages 345-367.
 Pierrick Bruneau
 }
 \examples{
-temp <- classicEM(irisdata, 4)
+temp <- EM(irisdata, 4)
 getCouple(temp$labels, irislabels)
-#[1] 0.1524832
 }
 

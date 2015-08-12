@@ -14,6 +14,7 @@
 #include <R.h>
 #include <Rmath.h>
 #include <Rinternals.h>
+#include <R_ext/Boolean.h>
 #include "utils.h"
 
 
@@ -23,7 +24,9 @@ SEXP getLabels(SEXP mod, SEXP dataset) {
 	
 	PROTECT(mod=coerceVector(mod, VECSXP));
 	PROTECT(dataset=coerceVector(dataset, REALSXP));
-	
+	SEXP r_false = PROTECT(allocVector(INTSXP, 1));
+	INTEGER(r_false)[0] = 0;	
+
 	int k = length(coerceVector(getListElement(mod, "w"), REALSXP));
 	int n = INTEGER(getAttrib(dataset, R_DimSymbol))[0];
 	int d = INTEGER(getAttrib(dataset, R_DimSymbol))[1];
@@ -36,7 +39,7 @@ SEXP getLabels(SEXP mod, SEXP dataset) {
 	SEXP current;
 	for(int i=0; i<k; i++) {
 		current = mvndensity(coerceVector(VECTOR_ELT(coerceVector(getListElement(mod, "mean"), VECSXP), i), REALSXP),
-			coerceVector(VECTOR_ELT(coerceVector(getListElement(mod, "cov"), VECSXP), i), REALSXP), dataset);
+			coerceVector(VECTOR_ELT(coerceVector(getListElement(mod, "cov"), VECSXP), i), REALSXP), dataset, r_false);
 		view = gsl_matrix_column(response, i);
 		SXPtoVector(&(view.vector), current);
 		gsl_vector_scale(&(view.vector), REAL(coerceVector(getListElement(mod, "w"), REALSXP))[i]);
@@ -55,7 +58,7 @@ SEXP getLabels(SEXP mod, SEXP dataset) {
 	
 	gsl_matrix_free(response);
 	gsl_vector_free(gslres);
-	UNPROTECT(3);
+	UNPROTECT(4);
 	return(res);
 	
 

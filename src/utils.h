@@ -24,11 +24,23 @@
 #include <R.h>
 #include <Rmath.h>
 #include <Rinternals.h>
-#include <fftw3.h>
+#include <R_ext/Utils.h>
+#include <R_ext/Lapack.h>
+#include <R_ext/BLAS.h>
+#include <R_ext/Boolean.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifndef max
+	#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
+#endif
+
+#ifndef min
+	#define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
+#endif
+
 
 void printSxpIntVector(SEXP);
 void printSxpRealVector(SEXP);
@@ -37,7 +49,15 @@ void printGSLvector(gsl_vector *);
 void printGSLmatrix(gsl_matrix *);
 void printDoubleVector(double *, int);
 
+void toLower(double *, double *, int);
+
 int whichmax(gsl_vector *);
+int imin(double *, int, int);
+int imax(double *, int, int);
+double vmin(double *, int, int);
+double vmax(double *, int, int);
+int allequal(int *, int *, int);
+
 SEXP getListElement(SEXP, const char *);
 void vectorToSXP(SEXP *, gsl_vector *);
 void intVectorToSXP(SEXP *, gsl_vector *);
@@ -49,7 +69,13 @@ double GSLvectorSum(gsl_vector *);
 SEXP multinomial(SEXP, SEXP);
 SEXP mvngen(SEXP, SEXP, SEXP);
 SEXP gmmgen(SEXP, SEXP);
-SEXP mvndensity(SEXP, SEXP, SEXP);
+SEXP mvndensity(SEXP, SEXP, SEXP, SEXP);
+SEXP mvnradiusdensity(SEXP, SEXP);
+double dmnorm(double *, double *, double, double *,int, int, const char *);
+double drmnorm(double *, double *, double, double *,int, int, const char *);
+void symdecomp(double *, double *, double *, int, const char *);
+
+
 SEXP gmmdensity(SEXP, SEXP);
 SEXP klmc(SEXP, SEXP, SEXP);
 SEXP jsmc(SEXP, SEXP, SEXP);
@@ -129,15 +155,18 @@ SEXP pointwise(SEXP, SEXP);
 int gramschmidt(gsl_matrix *);
 SEXP R_gramschmidt(const SEXP);
 void upperComplete(gsl_matrix *);
+void lowerComplete(double *, int);
+void fillUpper(double *, int);
+void fillLower(double *, int);
 SEXP sort_index(SEXP, SEXP);
 
 void GSLsample(int, int, int*);
 SEXP sample(SEXP, SEXP);
 int contains(int, int, int*);
 
-SEXP Rdct(SEXP);
-SEXP Rdct2D(SEXP);
-SEXP RinvDct2D(SEXP);
+//SEXP Rdct(SEXP);
+//SEXP Rdct2D(SEXP);
+//SEXP RinvDct2D(SEXP);
 SEXP control(SEXP, SEXP);
 double getDistance(gsl_vector *, gsl_vector *);
 void getColumnNorms(gsl_matrix *, gsl_vector *);
@@ -145,6 +174,7 @@ void getCovariance(gsl_matrix *, gsl_matrix *);
 void getMean(gsl_matrix *, gsl_vector *);
 
 SEXP rDirichlet(SEXP, SEXP);
+SEXP gdist(SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 }
