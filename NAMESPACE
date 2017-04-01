@@ -1,5 +1,6 @@
-useDynLib(VBmix)
+useDynLib(VBmix, .registration=TRUE, .fixes=".")
+exportPattern("[^.].*")
 importFrom("graphics", "lines", "par", "plot", "points", "polygon", "smoothScatter", "text")
 importFrom("grDevices", "col2rgb", "colors", "rgb")
 importFrom("stats", "dnorm", "predict", "runif", "rnorm", "rpois")
-exportPattern(".*")
+

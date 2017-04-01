@@ -2,14 +2,14 @@
 
 # interfaces to C entry points
 
-mkmeans <- function(dat, k, maxiter=100, seeds=NULL) {
+mkmeans <- function(dat, k, maxiter=100, seeds=NULL, prior=1) {
 	if(is.null(seeds)) {
 		seeds <- sample(0:(dim(dat)[1]-1), k)
 	}
-	.Call("mkmeans", dat, k, maxiter, seeds, PACKAGE="VBmix")
+	.Call("mkmeans", dat, k, maxiter, seeds, prior, PACKAGE="VBmix")
 }
 
-gdist <- function(g1, g2, metric=NULL) {
+gdist <- function(g1, g2, metric=NULL, norm=FALSE) {
 	if(is.null(metric)) metric <- diag(dim(g1)[2])
 	# cast to list
 	if(is.matrix(metric)) {
@@ -17,7 +17,7 @@ gdist <- function(g1, g2, metric=NULL) {
 		dummy[[1]] <- metric
 		metric <- dummy
 	}
-	.Call("gdist", g1, g2, metric, PACKAGE="VBmix")
+	.Call("gdist", g1, g2, metric, norm, PACKAGE="VBmix")
 }
 
 varbayes <- function(data, ncomp, thres=0.1, maxit=NULL) {

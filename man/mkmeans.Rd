@@ -8,7 +8,7 @@ Mahalanobis K-means
 K-means variant that uses a class-wise Mahalanobis metric. The implementation follows somewhat Lloyd's, with class-wise covariance computation step following that of centres.
 }
 \usage{
-mkmeans(dat, k, maxiter = 100, seeds = NULL)
+mkmeans(dat, k, maxiter = 100, seeds = NULL, prior = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -24,6 +24,9 @@ Maximum number of iterations.
   \item{seeds}{
 Optional indexes of initial centres taken in the input data. If NULL, uniform sampling is used.
 }
+  \item{prior}{
+  Prior population size used for regularizing components.
+  }
 }
 \details{
 K-means is characterized by the use of identity as the metric. To remain close to this in spirit, each class-wise covariance matrix is normalized after computation so that is trace equals d. This avoids excessively unbalanced classes, while facilitating the case where the support of a given cluster is less than 2 - covariance cannot be computed in this case. Covariance then defaults to identity. Also to prevent degeneracies when 2 < cluster size < d, a regularization term proportional to sample data features is added to the covariance diagonal.

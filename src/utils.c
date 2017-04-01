@@ -2485,7 +2485,7 @@ SEXP rDirichlet(SEXP K, SEXP R_alpha) {
 }
 
 // dist between 2 groups of elements, wrt to a mahalanobis metric
-SEXP gdist(SEXP g1, SEXP g2, SEXP metric) {
+SEXP gdist(SEXP g1, SEXP g2, SEXP metric, SEXP norm) {
 	PROTECT(g1 = coerceVector(g1, REALSXP));
 	PROTECT(g2 = coerceVector(g2, REALSXP));
 	// metric is a list:
@@ -2501,6 +2501,7 @@ SEXP gdist(SEXP g1, SEXP g2, SEXP metric) {
 	int d = INTEGER(getAttrib(g1, R_DimSymbol))[1];	
 	double *c_g1 = REAL(g1);
 	double *c_g2 = REAL(g2);
+	int c_norm = INTEGER(norm)[0];
 
 	//double *c_metric = REAL(metric);
 	double *vec1 = calloc(d, sizeof(double));
@@ -2532,7 +2533,14 @@ SEXP gdist(SEXP g1, SEXP g2, SEXP metric) {
 			alpha=1.0;
 
 			F77_CALL(dsymv)("L", &d, &alpha, c_inverse, &d, vec1, &i1, &beta, vec2, &i1);
-			c_dists[j*n1+i] = sqrt(F77_CALL(ddot)(&d, vec1, &i1, vec2, &i1));
+			// according to ekmeans reference, no sqrt
+			//c_dists[j*n1+i] = sqrt(F77_CALL(ddot)(&d, vec1, &i1, vec2, &i1));
+			c_dists[j*n1+i] = F77_CALL(ddot)(&d, vec1, &i1, vec2, &i1);
+			if(c_norm == TRUE)
+			{
+				c_dists[j*n1+i] += lndet;
+			}
+			
 		}
 	}
 

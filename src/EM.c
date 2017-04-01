@@ -153,11 +153,11 @@ SEXP EM(SEXP data, SEXP ncomp, SEXP model, SEXP class, SEXP thres, SEXP maxit, S
 			// k-means_like init
 			c_mean[i][j] = c_data[j*n + (c_seeds[i]-1)];
 			if(!strcmp(c_model, "general")) {
-				c_cov[i][j*d+j] = pow(c_maxs[j] - c_mins[j], 2.0) / 4.0;
+				c_cov[i][j*d+j] = pow(c_maxs[j] - c_mins[j], 2.0) / 64.0;
 			} else if(!strcmp(c_model, "diagonal")) {
-				c_cov[i][j] = pow(c_maxs[j] - c_mins[j], 2.0) / 4.0;
+				c_cov[i][j] = pow(c_maxs[j] - c_mins[j], 2.0) / 64.0;
 			} else {
-				c_cov[i][0] += pow(c_maxs[j] - c_mins[j], 2.0) / 4.0;
+				c_cov[i][0] += pow(c_maxs[j] - c_mins[j], 2.0) / 64.0;
 			}
 		}
 		if(!strcmp(c_model, "spherical")) {

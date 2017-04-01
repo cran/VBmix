@@ -75,7 +75,6 @@ double dmnorm(double *, double *, double, double *,int, int, const char *);
 double drmnorm(double *, double *, double, double *,int, int, const char *);
 void symdecomp(double *, double *, double *, int, const char *);
 
-
 SEXP gmmdensity(SEXP, SEXP);
 SEXP klmc(SEXP, SEXP, SEXP);
 SEXP jsmc(SEXP, SEXP, SEXP);
@@ -174,7 +173,7 @@ void getCovariance(gsl_matrix *, gsl_matrix *);
 void getMean(gsl_matrix *, gsl_vector *);
 
 SEXP rDirichlet(SEXP, SEXP);
-SEXP gdist(SEXP, SEXP, SEXP);
+SEXP gdist(SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 }

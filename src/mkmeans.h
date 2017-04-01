@@ -12,7 +12,7 @@
 #include "utils.h"
 
 
-SEXP mkmeans(SEXP, SEXP, SEXP, SEXP);
+SEXP mkmeans(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #endif
 

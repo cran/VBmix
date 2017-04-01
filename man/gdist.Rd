@@ -5,10 +5,10 @@
 Pairwise distance between groups
 }
 \description{
-dist computes distances between every pair of elements in a group: gdist takes two arguments, and returns the matrix of distances wrt every possible pair with one argument from each group. General Mahalanobis metrics are also allowed.
+dist computes distances between pairs of elements: gdist takes two arguments, and returns the matrix of distances wrt every possible pair with one argument from each group. General Mahalanobis metrics are also allowed.
 }
 \usage{
-gdist(g1, g2, metric = NULL)
+gdist(g1, g2, metric = NULL, norm=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,6 +21,9 @@ gdist(g1, g2, metric = NULL)
   \item{metric}{
   If NULL, defaults to identity (i.e. Euclidean distance). A d x d matrix is assumed as a sample covariance matrix, and its inverse is used to compute distances (i.e. Mahalanobis distance). Likewise, a list of n2 d x d matrices can be provided, yielding distances specific to each row in g2. 
 }
+  \item{norm}{
+  If TRUE, a ln det term is added to distances in order to mitigate the prevalence of metrics reflecting large variance.
+  }
 }
 \details{
 This function is especially useful to make algorithms such as k-means (or mkmeans in the package) more efficient - rows in g1 are then generally the data set, and in g2 respectively cluster centres.
